@@ -354,6 +354,8 @@ function cargarResumen(){
   resumen.innerHTML=html;
 }
 
+const selectorMoto = document.getElementById('selectorMoto');
+
 function actualizarSelector(){
   const selector = document.getElementById('selectorMoto');
   if(!selector) return;
@@ -362,13 +364,14 @@ function actualizarSelector(){
   selector.innerHTML = motos.map(m=>`<option value="${m.id}" ${m.id===activa?'selected':''}>${m.datos.marca} ${m.datos.modelo}</option>`).join('');
 }
 
-selectorMoto.onchange = () => {
-  setMotoActiva(selectorMoto.value);
-  actualizarSelector();
-  actualizarSelector();
-  cargarResumen();
-  cargarHistorial();
-};
+if(selectorMoto){
+  selectorMoto.onchange = () => {
+    setMotoActiva(selectorMoto.value);
+    actualizarSelector();
+    cargarResumen();
+    cargarHistorial();
+  };
+}
 
 /* =====================
    INIT
@@ -382,4 +385,3 @@ cargarHistorial();
 </script>
 </body>
 </html>
-l>
