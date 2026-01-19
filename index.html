@@ -134,319 +134,153 @@ button.primary:hover{transform:translateY(-1px)}
 <script>
 window.addEventListener('DOMContentLoaded', () => {
 
-  // --- PWA INSTALL PROMPT (ANDROID) ---
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    console.log('PWA instalable');
-  });
+/* =====================
+   MODELO MULTI-MOTO v2
+   ===================== */
 
-  // Registrar Service Worker (PWA)
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js').then(() => {
-      console.log('Service Worker registrado');
-    });
-  }
+// --- MIGRACIÓN SEGURA ---
+(function migrarDatos(){
+  const motos = JSON.parse(localStorage.getItem('motos'));
+  if(motos) return; // ya migrado
 
-  /* --- MIGRACIÓN SEGURA DE DATOS ANTIGUOS --- */
-  function normalizarHistorial(){
-    const h = JSON.parse(localStorage.getItem('historial') || '[]');
-    const normalizado = h.map(r => ({
-      km: r.km || '',
-      fecha: r.fecha || '',
-      obs: r.obs || '',
-      pendiente: r.pendiente || '',
-      revisiones: Array.isArray(r.revisiones) ? r.revisiones : [],
-      fotos: Array.isArray(r.fotos) ? r.fotos : []
-    }));
-    localStorage.setItem('historial', JSON.stringify(normalizado));
-    return normalizado;
-  }
+  const motoAntigua = JSON.parse(localStorage.getItem('moto'));
+  const historialAntiguo = JSON.parse(localStorage.getItem('historial')||'[]');
 
-  function mostrar(id){
-    document.getElementById('home').classList.add('hidden');
-    ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-  }
-
-  function volver(){
-    ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
-    document.getElementById('home').classList.remove('hidden');
-    cargarResumen();
-  }
-
-  function onGuardarMoto(){
-    // Validación SOLO de datos de la moto
-    if(!marca.value || !modelo.value || !anio.value || !cilindrada.value || !neumaticos.value){
-      alert('Debes rellenar todos los datos de la moto antes de guardar');
-      return;
-    }
-
-    const moto = {
-      marca: marca.value.trim(),
-      modelo: modelo.value.trim(),
-      anio: anio.value.trim(),
-      cilindrada: cilindrada.value.trim(),
-      neumaticos: neumaticos.value.trim(),
-      itv: itv.value.trim()
+  if(motoAntigua){
+    const nuevaMoto = {
+      id: crypto.randomUUID(),
+      datos: motoAntigua,
+      historial: historialAntiguo
     };
-
-    localStorage.setItem('moto', JSON.stringify(moto));
-    alert('Moto guardada correctamente');
-    cargarResumen();
+    localStorage.setItem('motos', JSON.stringify([nuevaMoto]));
+    localStorage.setItem('motoActivaId', nuevaMoto.id);
+    localStorage.removeItem('moto');
+    localStorage.removeItem('historial');
+  } else {
+    localStorage.setItem('motos', JSON.stringify([]));
   }
+})();
 
-    const moto = {
-      marca: marca.value.trim(),
-      modelo: modelo.value.trim(),
-      anio: anio.value.trim(),
-      cilindrada: cilindrada.value.trim(),
-      neumaticos: neumaticos.value.trim(),
-      itv: itv.value.trim()
-    };
+function getMotos(){ return JSON.parse(localStorage.getItem('motos')||'[]'); }
+function setMotos(m){ localStorage.setItem('motos',JSON.stringify(m)); }
+function getMotoActiva(){
+  const id = localStorage.getItem('motoActivaId');
+  return getMotos().find(m=>m.id===id);
+}
 
-    localStorage.setItem('moto', JSON.stringify(moto));
-    alert('Moto guardada correctamente');
-    cargarResumen();
-  }
+function setMotoActiva(id){ localStorage.setItem('motoActivaId',id); }
 
-  function onGuardarRevision(){
-    const moto = JSON.parse(localStorage.getItem('moto'));
-    if(!moto){ 
-      alert('Primero debes guardar los datos de tu moto'); 
-      return; 
-    }
-
-    const revisiones = [...document.querySelectorAll('.rev:checked')].map(r=>r.value);
-    if(!km.value || !fecha.value){
-      alert('Debes indicar kilómetros y fecha de la revisión');
-      return;
-    }
-    if(revisiones.length === 0){
-      alert('Debes seleccionar al menos una operación de mantenimiento');
-      return;
-    }
-
-    const files = document.getElementById('fotos').files;
-    const leerFotos = () => new Promise(resolve => {
-      if(!files.length){ resolve([]); return; }
-      const fotos = [];
-      let cargadas = 0;
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          fotos.push(e.target.result);
-          cargadas++;
-          if(cargadas === files.length) resolve(fotos);
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    leerFotos().then(fotosGuardadas => {
-      const data = {
-        km: km.value,
-        fecha: fecha.value,
-        obs: obs.value,
-        pendiente: pendiente.value,
-        revisiones,
-        fotos: fotosGuardadas
-      };
-
-      const h = normalizarHistorial();
-      h.push(data);
-      localStorage.setItem('historial', JSON.stringify(h));
-      alert('Revisión guardada correctamente');
-      cargarHistorial();
-      cargarResumen();
-    });
-  }
-    const revisiones = [...document.querySelectorAll('.rev:checked')].map(r=>r.value);
-    if(!km.value || !fecha.value || revisiones.length===0){
-      alert('Completa todos los datos y selecciona revisiones');
-      return;
-    }
-
-    const files = document.getElementById('fotos').files;
-    const leerFotos = () => new Promise(resolve => {
-      if(!files.length){ resolve([]); return; }
-      const fotos = [];
-      let cargadas = 0;
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          fotos.push(e.target.result);
-          cargadas++;
-          if(cargadas === files.length) resolve(fotos);
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    leerFotos().then(fotosGuardadas => {
-      const data = {
-        km: km.value,
-        fecha: fecha.value,
-        obs: obs.value,
-        pendiente: pendiente.value,
-        revisiones,
-        fotos: fotosGuardadas
-      };
-
-      const h = normalizarHistorial();
-      h.push(data);
-      localStorage.setItem('historial', JSON.stringify(h));
-      alert('Revisión guardada');
-      cargarHistorial();
-    });
-  }
-
-  function cargarHistorial(){
-    const h = normalizarHistorial();
-    listaHistorial.innerHTML = h.map((r,i) => {
-      const revs = r.revisiones.length ? r.revisiones.join(', ') : '—';
-      const fotosHtml = r.fotos.length ? r.fotos.map((f,fi)=>`<div style="display:inline-block;position:relative"><img src="${f}" style="width:60px;border-radius:6px;margin:4px"/><button onclick="borrarFoto(${i},${fi})" style="position:absolute;top:0;right:0;background:#020617;border:none;color:#f87171;border-radius:50%">✕</button></div>`).join('') : '';
-      return `<li data-index="${i}"><b>${r.fecha}</b> · ${r.km} km<br>
-      Revisiones: ${revs}<br>
-      Observaciones: ${r.obs}<br>
-      Pendiente: ${r.pendiente}<br>
-      ${fotosHtml}
-      <div style="margin-top:8px">
-        <button onclick="editarRevision(${i})" style="background:none;border:none;color:#38bdf8">✏️ Editar</button>
-        <button onclick="borrarRevision(${i})" style="background:none;border:none;color:#f87171;margin-left:12px">🗑️ Borrar</button>
-      </div>
-      </li>`;
-    }).join('');
-  }
-
-  function cargarResumen(){
-    const moto = JSON.parse(localStorage.getItem('moto'));
-    const h = normalizarHistorial();
-    let html = '<h3>📊 Resumen</h3>';
-    if(moto){
-      html += `<p>${moto.marca} ${moto.modelo} (${moto.anio})</p>`;
-      if(moto.itv) html += `<p>ITV: ${moto.itv}</p>`;
-    }
-    if(h.length){
-      const ultima = h[h.length-1];
-      html += `<p>Última revisión: ${ultima.fecha} · ${ultima.km} km</p>`;
-      const proximaKm = Number(ultima.km)+10000;
-      html += `<p>Próxima revisión estimada: ${proximaKm} km</p>`;
-      comprobarAvisos(moto, proximaKm);
-    }
-    resumen.innerHTML = html;
-  }
-
-  function comprobarAvisos(moto, proximaKm){
-    if(!('Notification' in window)) return;
-    if(Notification.permission === 'default'){
-      Notification.requestPermission();
-    }
-    if(Notification.permission !== 'granted') return;
-
-    const avisados = JSON.parse(localStorage.getItem('avisos')||'{}');
-
-    if(moto && moto.itv && !avisados.itv){
-      const hoy = new Date();
-      const [d,m,y] = moto.itv.split('/');
-      const fechaItv = new Date(`${y}-${m}-${d}`);
-      const diff = (fechaItv - hoy)/(1000*60*60*24);
-      if(diff <= 30 && diff >= 0){
-        new Notification('MotoCare · ITV próxima',{
-          body:`Tu ITV vence en ${Math.ceil(diff)} días`,
-          icon:'icon-192.png'
-        });
-        avisados.itv = true;
-      }
-    }
-
-    if(!avisados.revision && proximaKm){
-      new Notification('MotoCare · Revisión',{
-        body:`Te toca revisión a los ${proximaKm} km`,
-        icon:'icon-192.png'
-      });
-      avisados.revision = true;
-    }
-    localStorage.setItem('avisos',JSON.stringify(avisados));
-  } ${moto.modelo} (${moto.anio})</p>`;
-      if(moto.itv) html += `<p>ITV: ${moto.itv}</p>`;
-    }
-    if(h.length){
-      const ultima = h[h.length-1];
-      html += `<p>Última revisión: ${ultima.fecha} · ${ultima.km} km</p>`;
-      html += `<p>Próxima revisión estimada: ${Number(ultima.km)+10000} km</p>`;
-    }
-    resumen.innerHTML = html;
-  }
-
-  document.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>mostrar(b.dataset.target));
-  document.querySelectorAll('.volver').forEach(b=>b.onclick=volver);
-  document.getElementById('guardarMoto').onclick = onGuardarMoto;
-  document.getElementById('guardarRevision').onclick = onGuardarRevision;
-  document.getElementById('exportarPdf').onclick = () => window.print();
-  let ultimaBorrada = null;
-function borrarRevision(index){
-  if(!confirm('¿Borrar esta revisión?')) return;
-  const h = normalizarHistorial();
-  ultimaBorrada = { data: h[index], index };
-  h.splice(index,1);
-  localStorage.setItem('historial',JSON.stringify(h));
-  cargarHistorial();
+/* =====================
+   NAVEGACIÓN
+   ===================== */
+function mostrar(id){
+  document.getElementById('home').classList.add('hidden');
+  ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+function volver(){
+  ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById('home').classList.remove('hidden');
   cargarResumen();
-  mostrarUndo();
 }
 
-function mostrarUndo(){
-  let u = document.getElementById('undo');
-  if(!u){
-    u = document.createElement('div');
-    u.id = 'undo';
-    u.style = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#020617;color:#e5e7eb;padding:12px 16px;border-radius:14px;border:1px solid #334155;z-index:9999';
-    document.body.appendChild(u);
+/* =====================
+   GUARDAR MOTO
+   ===================== */
+document.getElementById('guardarMoto').onclick = () => {
+  if(!marca.value||!modelo.value||!anio.value||!cilindrada.value||!neumaticos.value){
+    alert('Debes rellenar todos los datos de la moto'); return;
   }
-  u.innerHTML = 'Revisión borrada <button onclick="deshacerBorrado()" style="margin-left:12px;background:none;border:none;color:#38bdf8">Deshacer</button>';
-  setTimeout(()=>{ if(u) u.remove(); },8000);
-}
-
-function deshacerBorrado(){
-  if(!ultimaBorrada) return;
-  const h = normalizarHistorial();
-  h.splice(ultimaBorrada.index,0,ultimaBorrada.data);
-  localStorage.setItem('historial',JSON.stringify(h));
-  ultimaBorrada = null;
-  cargarHistorial();
-  cargarResumen();
-  const u = document.getElementById('undo'); if(u) u.remove();
-}
-
-function borrarFoto(revIndex,fotoIndex){ const h = normalizarHistorial(); h[revIndex].fotos.splice(fotoIndex,1); localStorage.setItem('historial',JSON.stringify(h)); cargarHistorial(); }
-
-function editarRevision(index){
-  const h = normalizarHistorial();
-  const r = h[index];
-  mostrar('mantenimiento');
-  km.value = r.km;
-  fecha.value = r.fecha;
-  obs.value = r.obs;
-  pendiente.value = r.pendiente;
-  document.querySelectorAll('.rev').forEach(c=>c.checked = r.revisiones.includes(c.value));
-  h.splice(index,1);
-  localStorage.setItem('historial',JSON.stringify(h));
-  alert('Edita los datos y guarda para actualizar la revisión');
-}
-
-document.getElementById('enviarEmail').onclick = () => {
-    const moto = JSON.parse(localStorage.getItem('moto')) || {};
-    const subject = encodeURIComponent('Historial de mantenimiento de mi moto');
-    const body = encodeURIComponent(`Adjunto historial de mantenimiento.
-
-Moto: ${moto.marca||''} ${moto.modelo||''} (${moto.anio||''})`);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  const motos = getMotos();
+  const nueva = {
+    id: crypto.randomUUID(),
+    datos: {
+      marca: marca.value,
+      modelo: modelo.value,
+      anio: anio.value,
+      cilindrada: cilindrada.value,
+      neumaticos: neumaticos.value,
+      itv: itv.value
+    },
+    historial: []
   };
-
+  motos.push(nueva);
+  setMotos(motos);
+  setMotoActiva(nueva.id);
+  alert('Moto guardada correctamente');
   cargarResumen();
-  cargarHistorial();
+  volver();
+};
+
+/* =====================
+   GUARDAR REVISIÓN
+   ===================== */
+document.getElementById('guardarRevision').onclick = () => {
+  const moto = getMotoActiva();
+  if(!moto){ alert('Primero guarda una moto'); return; }
+  const revisiones = [...document.querySelectorAll('.rev:checked')].map(r=>r.value);
+  if(!km.value||!fecha.value||revisiones.length===0){
+    alert('Completa km, fecha y revisiones'); return;
+  }
+  const files = fotos.files;
+  const leer = () => new Promise(res=>{
+    if(!files.length){res([]);return;}
+    const f=[];let c=0;
+    [...files].forEach(fl=>{
+      const r=new FileReader();
+      r.onload=e=>{f.push(e.target.result);if(++c===files.length)res(f)};
+      r.readAsDataURL(fl);
+    });
+  });
+  leer().then(fotosData=>{
+    moto.historial.push({
+      km: km.value, fecha: fecha.value,
+      obs: obs.value, pendiente: pendiente.value,
+      revisiones, fotos: fotosData
+    });
+    const motos = getMotos().map(m=>m.id===moto.id?m:m);
+    setMotos(motos);
+    alert('Revisión guardada');
+    cargarHistorial(); cargarResumen(); volver();
+  });
+};
+
+/* =====================
+   HISTORIAL
+   ===================== */
+function cargarHistorial(){
+  const moto = getMotoActiva();
+  if(!moto){ listaHistorial.innerHTML=''; return; }
+  listaHistorial.innerHTML = moto.historial.map((r,i)=>`
+    <li><b>${r.fecha}</b> · ${r.km} km<br>
+    ${r.revisiones.join(', ')}<br>
+    ${r.fotos.map(f=>`<img src="${f}" width="60"/>`).join('')}
+    </li>`).join('');
+}
+
+/* =====================
+   RESUMEN
+   ===================== */
+function cargarResumen(){
+  const moto = getMotoActiva();
+  if(!moto){ resumen.innerHTML='<p>No hay moto guardada</p>'; return; }
+  const h = moto.historial;
+  let html = `<h3>${moto.datos.marca} ${moto.datos.modelo}</h3>`;
+  if(h.length){
+    const u=h[h.length-1];
+    html+=`<p>Última revisión: ${u.fecha} · ${u.km} km</p>`;
+  }
+  resumen.innerHTML=html;
+}
+
+/* =====================
+   INIT
+   ===================== */
+document.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>mostrar(b.dataset.target));
+document.querySelectorAll('.volver').forEach(b=>b.onclick=volver);
+
+cargarResumen();
+cargarHistorial();
 });
 </script>
 </body>
