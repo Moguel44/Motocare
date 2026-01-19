@@ -1,7 +1,8 @@
 {
   "name": "MotoCare",
   "short_name": "MotoCare",
-  "start_url": ".",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#22d3ee",
