@@ -16,7 +16,7 @@ h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
 .subtitle{opacity:.8;margin:0;font-size:14px}
 .menu{display:flex;flex-direction:column;gap:12px;margin-top:24px}
 .menu button{background:var(--card);color:#e5e7eb;border:1px solid var(--border);padding:16px;border-radius:16px;font-size:16px;text-align:left}
-.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px}
+.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px;position:relative;z-index:1}
 .hidden{display:none}
 input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
 label{display:flex;align-items:center;gap:12px;margin:10px 0}
@@ -56,7 +56,7 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
 
 <div id="moto" class="card hidden">
   <h2>🏍️ Tu moto</h2>
-  <div style="display:flex;gap:12px;flex-wrap:wrap">
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
     <button class="primary" id="btnNuevaMoto">➕ Nueva moto</button>
     <button class="primary" id="btnEditarMoto">✏️ Editar moto</button>
     <button class="primary" id="btnBorrarMoto" style="background:#7f1d1d">🗑️ Eliminar</button>
@@ -149,17 +149,32 @@ document.addEventListener('DOMContentLoaded', function () {
     return txt;
   }
 
-  $('btnPdf') && ($('btnPdf').onclick=()=>{ prepararPdf(); window.print(); });
+  $('btnPdf') && ($('btnPdf').onclick=()=>{
+    prepararPdf();
+    if(typeof window.print === 'function'){
+      try{ window.print(); }
+      catch(e){ alert('La impresión no está soportada en esta app. Usa la versión web.'); }
+    } else {
+      alert('La impresión no está soportada en esta app. Usa la versión web.');
+    }
+  });
 
   // Guardar PDF (usa diálogo nativo de Android / navegador)
   $('btnGuardarPdf') && ($('btnGuardarPdf').onclick=()=>{
     prepararPdf();
-    alert('Se abrirá el diálogo del sistema. Elige "Guardar como PDF" para almacenarlo en tu móvil.');
-    window.print();
+    if(typeof window.print === 'function'){
+      alert('Se abrirá el diálogo del sistema. Elige "Guardar como PDF".');
+      try{ window.print(); }
+      catch(e){ alert('Guardar PDF no está soportado en esta app. Usa la versión web.'); }
+    } else {
+      alert('Guardar PDF no está soportado en esta app. Usa la versión web.');
+    }
   });
   $('btnEmail') && ($('btnEmail').onclick=()=>{
     const body=encodeURIComponent(generarTextoHistorial());
-    location.href=`mailto:?subject=Historial MotoCare&body=${body}`;
+    const url=`mailto:?subject=Historial MotoCare&body=${body}`;
+    try{ window.location.href=url; }
+    catch(e){ alert('El envío por correo no está soportado en esta app. Usa la versión web.'); }
   });
 
   document.querySelectorAll('.menu button').forEach(b => b.onclick = () => mostrar(b.dataset.target));
