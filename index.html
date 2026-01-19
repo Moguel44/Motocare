@@ -91,6 +91,11 @@ button.primary:hover{transform:translateY(-1px)}
 <!-- TU MOTO -->
 <div id="moto" class="card hidden">
   <h2>🏍️ Tu moto</h2>
+  <div style="display:flex;gap:12px;margin-bottom:12px">
+    <button class="primary" id="btnNuevaMoto" type="button">➕ Nueva moto</button>
+    <button class="primary" id="btnEditarMoto" type="button">✏️ Editar moto activa</button>
+    <button class="primary" id="btnBorrarMoto" type="button" style="background:#7f1d1d">🗑️ Eliminar moto</button>
+  </div>
   <input id="marca" placeholder="Marca" />
   <input id="modelo" placeholder="Modelo" />
   <input id="anio" placeholder="Año" />
@@ -200,6 +205,7 @@ function mostrar(id){
   ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
+}
 function volver(){
   ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
   document.getElementById('home').classList.remove('hidden');
@@ -209,24 +215,70 @@ function volver(){
 /* =====================
    GUARDAR MOTO
    ===================== */
+let modoMoto = 'nueva';
+
+document.getElementById('btnNuevaMoto').onclick = () => {
+  modoMoto = 'nueva';
+  marca.value=''; modelo.value=''; anio.value=''; cilindrada.value=''; neumaticos.value=''; itv.value='';
+};
+
+document.getElementById('btnEditarMoto').onclick = () => {
+  const moto = getMotoActiva();
+  if(!moto){ alert('No hay moto activa'); return; }
+  modoMoto = 'editar';
+  marca.value=moto.datos.marca||'';
+  modelo.value=moto.datos.modelo||'';
+  anio.value=moto.datos.anio||'';
+  cilindrada.value=moto.datos.cilindrada||'';
+  neumaticos.value=moto.datos.neumaticos||'';
+  itv.value=moto.datos.itv||'';
+};
+
+// BORRAR MOTO + HISTORIAL
+
+document.getElementById('btnBorrarMoto').onclick = () => {
+  const motos = getMotos();
+  const activaId = localStorage.getItem('motoActivaId');
+  const moto = motos.find(m=>m.id===activaId);
+  if(!moto){ alert('No hay moto activa'); return; }
+
+  const ok = confirm(`¿Seguro que quieres eliminar la moto ${moto.datos.marca} ${moto.datos.modelo}?
+
+Se borrará todo su historial y no se puede deshacer.`);
+  if(!ok) return;
+
+  const restantes = motos.filter(m=>m.id!==activaId);
+  setMotos(restantes);
+
+  if(restantes.length){
+    setMotoActiva(restantes[0].id);
+  } else {
+    localStorage.removeItem('motoActivaId');
+  }
+
+  actualizarSelector();
+  cargarResumen();
+  cargarHistorial();
+  volver();
+};
+
 document.getElementById('guardarMoto').onclick = () => {
   if(!marca.value||!modelo.value||!anio.value||!cilindrada.value||!neumaticos.value){
     alert('Debes rellenar todos los datos de la moto'); return;
   }
   const motos = getMotos();
-  const nueva = {
-    id: crypto.randomUUID(),
-    datos: {
-      marca: marca.value,
-      modelo: modelo.value,
-      anio: anio.value,
-      cilindrada: cilindrada.value,
-      neumaticos: neumaticos.value,
-      itv: itv.value
-    },
-    historial: []
-  };
-  motos.push(nueva);
+  if(modoMoto==='editar'){
+    const moto = getMotoActiva();
+    moto.datos = { marca: marca.value, modelo: modelo.value, anio: anio.value, cilindrada: cilindrada.value, neumaticos: neumaticos.value, itv: itv.value };
+  } else {
+    const nueva = {
+      id: crypto.randomUUID(),
+      datos: { marca: marca.value, modelo: modelo.value, anio: anio.value, cilindrada: cilindrada.value, neumaticos: neumaticos.value, itv: itv.value },
+      historial: []
+    };
+    motos.push(nueva);
+    setMotoActiva(nueva.id);
+  }
   setMotos(motos);
   setMotoActiva(nueva.id);
 
