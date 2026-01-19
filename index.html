@@ -14,9 +14,10 @@ body::before{content:"";position:fixed;inset:0;background:rgba(2,6,23,.85);z-ind
 .logo-big{width:140px;height:140px;border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.7);margin-bottom:8px}
 h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
 .subtitle{opacity:.8;margin:0;font-size:14px}
-.menu{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.menu{display:flex;flex-direction:column;gap:14px;margin-top:24px}
+@media(min-width:768px){.menu{flex-direction:row}}
 .menu button{background:var(--card);color:#e5e7eb;border:1px solid var(--border);padding:16px;border-radius:16px;font-size:16px;text-align:left}
-.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px}
+.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px;max-width:720px;margin-left:auto;margin-right:auto}
 .hidden{display:none}
 input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
 button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#020617;border:none;padding:16px;border-radius:18px;font-size:16px;font-weight:600;width:100%;margin-top:12px}
@@ -58,6 +59,7 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
   <input id="itv" placeholder="ITV" />
   <div class="actions">
     <button class="primary" id="guardarMoto">Guardar moto</button>
+    <button class="primary" id="nuevaMoto">Nueva moto</button>
     <button class="primary volver">Volver</button>
   </div>
 </div>
@@ -108,7 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
   $('guardarMoto').onclick = () => {
     if(!$('marca').value) return alert('Marca requerida');
     const motos=getMotos();
-    const moto={id:crypto.randomUUID(),datos:{marca:$('marca').value,modelo:$('modelo').value},historial:[]};
+    const moto={
+      id:(window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'moto-'+Date.now()+Math.random().toString(16).slice(2),
+      datos:{marca:$('marca').value,modelo:$('modelo').value},
+      historial:[]
+    };
     motos.push(moto);
     setMotos(motos);
     localStorage.setItem('motoActivaId', moto.id);
@@ -148,3 +154,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
