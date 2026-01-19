@@ -270,18 +270,6 @@ function cargarResumen(){
   if(!moto){ resumen.innerHTML='<p>No hay moto guardada</p>'; return; }
   const h = moto.historial;
   let html = `<h3>${moto.datos.marca} ${moto.datos.modelo}</h3>`;
-  html += `<p>${moto.datos.cilindrada} cc · ${moto.datos.neumaticos}</p>`;
-  if(moto.datos.itv) html += `<p>ITV: ${moto.datos.itv}</p>`;
-  if(h.length){
-    const u=h[h.length-1];
-    html+=`<p>Última revisión: ${u.fecha} · ${u.km} km</p>`;
-  } else {
-    html+=`<p>Sin revisiones registradas</p>`;
-  }
-  resumen.innerHTML=html;
-}
-  const h = moto.historial;
-  let html = `<h3>${moto.datos.marca} ${moto.datos.modelo}</h3>`;
   if(h.length){
     const u=h[h.length-1];
     html+=`<p>Última revisión: ${u.fecha} · ${u.km} km</p>`;
