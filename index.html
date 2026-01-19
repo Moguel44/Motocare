@@ -1,6 +1,4 @@
-
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,28 +19,24 @@ h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
 .hidden{display:none}
 input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
 label{display:flex;align-items:center;gap:12px;margin:10px 0}
-button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#020617;border:none;padding:16px;border-radius:16px;font-size:16px;margin-top:12px}
-#listaHistorial{list-style:none;padding:0}
-@media print{
-  body{background:#fff;color:#000}
-  body::before,.menu,.volver,#btnPdf,#btnGuardarPdf,#btnEmail,select,.header{display:none!important}
-  .card{box-shadow:none;border:none;margin:0;padding:0}
-  h1,h2,h3{color:#000}
-  #historial{display:block!important}
-  #listaHistorial li{margin-bottom:12px}
-  #pdfHeader{display:block!important}
-}
-</style>
-</head>
-<body>
+button.primary{
+  background:linear-gradient(135deg,var(--accent),#38bdf8);
+  color:#020617;
+  border:none;
+  padding:16px;
+  border-radius:18px;
+  font-size:16px;
+  font-weight:600;
+  width:100%;
+  box-shadow:0 8px 20px rgba(34,211,238,.35);
+}button.primary.danger{ background:linear-gradient(135deg,#ef4444,#991b1b); color:#fff; box-shadow:0 8px 20px rgba(239,68,68,.35); } #listaHistorial{list-style:none;padding:0} @media print{ body{background:#fff;color:#000} body::before,.menu,.volver,#btnPdf,#btnGuardarPdf,#btnEmail,select,.header{display:none!important} .card{box-shadow:none;border:none;margin:0;padding:0} h1,h2,h3{color:#000} #historial{display:block!important} #listaHistorial li{margin-bottom:12px} #pdfHeader{display:block!important} } </style>
 
-<div class="header">
+</head>
+<body><div class="header">
   <img src="./Mi_Man.png" class="logo-big" alt="MotoCare" />
   <h1>MotoCare</h1>
   <p class="subtitle">Control total de tu moto</p>
-</div>
-
-<div id="home">
+</div><div id="home">
   <div class="card">
     <label>🏍️ Moto activa</label>
     <select id="selectorMoto"></select>
@@ -53,30 +47,22 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
     <button data-target="mantenimiento">🔧 Mantenimiento</button>
     <button data-target="historial">📜 Historial</button>
   </div>
-</div>
-
-<div id="moto" class="card hidden">
+</div><div id="moto" class="card hidden">
   <h2>🏍️ Tu moto</h2>
   <input id="marca" placeholder="Marca" />
   <input id="modelo" placeholder="Modelo" />
   <input id="anio" placeholder="Año" />
   <input id="cilindrada" placeholder="Cilindrada" />
   <input id="neumaticos" placeholder="Neumáticos" />
-  <input id="itv" placeholder="ITV" />
-
-  <div style="display:flex;gap:12px;margin-top:16px">
+  <input id="itv" placeholder="ITV" />  <div style="display:flex;gap:12px;margin-top:16px">
     <button class="primary" id="guardarMoto">💾 Guardar moto</button>
     <button class="primary volver">↩️ Volver</button>
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+  </div>  <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
     <button class="primary" id="btnNuevaMoto">➕ Nueva moto</button>
     <button class="primary" id="btnEditarMoto">✏️ Editar moto</button>
-    <button class="primary" id="btnBorrarMoto" style="background:#7f1d1d">🗑️ Eliminar moto</button>
+    <button class="primary danger" id="btnBorrarMoto">🗑️ Eliminar moto</button>
   </div>
-</div>
-
-<div id="mantenimiento" class="card hidden">
+</div><div id="mantenimiento" class="card hidden">
   <h2>Mantenimiento</h2>
   <input id="km" placeholder="Kilómetros" />
   <input id="fecha" placeholder="Fecha" />
@@ -86,27 +72,19 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
   <label><input type="checkbox" class="rev" value="Frenos">Frenos</label>
   <button class="primary" id="guardarRevision">Guardar revisión</button>
   <button class="primary volver">Volver</button>
-</div>
-
-<div id="historial" class="card hidden">
+</div><div id="historial" class="card hidden">
   <div id="pdfHeader" style="display:none;margin-bottom:16px;text-align:center">
     <img src="./Mi_Man.png" alt="MotoCare" style="width:80px;height:80px;border-radius:16px;margin-bottom:8px" />
     <h1 style="margin:0">MotoCare</h1>
     <p id="pdfMotoDatos" style="margin:6px 0 0 0"></p>
-  </div>
-
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+  </div>  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
     <button class="primary" id="btnPdf">📄 Exportar PDF</button>
     <button class="primary" id="btnGuardarPdf">💾 Guardar PDF</button>
     <button class="primary" id="btnEmail">✉️ Enviar por correo</button>
-  </div>
-
-  <h2>Historial</h2>
+  </div>  <h2>Historial</h2>
   <ul id="listaHistorial"></ul>
   <button class="primary volver">Volver</button>
-</div>
-
-<script>
+</div><script>
 document.addEventListener('DOMContentLoaded', function () {
   const $ = id => document.getElementById(id);
   const getMotos = () => JSON.parse(localStorage.getItem('motos') || '[]');
@@ -197,11 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
   actualizarSelector();
   cargarResumen();
 });
-</script>
-
-<!-- NOTA: El registro del Service Worker se elimina aquí para evitar SecurityError
+</script><!-- NOTA: El registro del Service Worker se elimina aquí para evitar SecurityError
      en entornos restringidos (sandbox, vista previa, algunos navegadores).
-     En producción (GitHub Pages / HTTPS real) se debe registrar en un archivo separado. -->
-
-</body>
+     En producción (GitHub Pages / HTTPS real) se debe registrar en un archivo separado. --></body>
 </html>
