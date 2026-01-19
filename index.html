@@ -219,6 +219,10 @@ document.getElementById('guardarMoto').onclick = () => {
   motos.push(nueva);
   setMotos(motos);
   setMotoActiva(nueva.id);
+
+  // LIMPIAR FORMULARIO
+  marca.value=''; modelo.value=''; anio.value=''; cilindrada.value=''; neumaticos.value=''; itv.value='';
+
   alert('Moto guardada correctamente');
   cargarResumen();
   volver();
