@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MotoCare</title>
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#020617;
+  --accent:#22d3ee;
+  --muted:#94a3b8;
+  --border:#334155;
+}
+
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#e5e7eb;margin:0;padding:16px;background:var(--bg);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background:rgba(2,6,23,0.85);z-index:-1}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:10;text-align:center;padding:20px 0;background:rgba(2,6,23,0.95);backdrop-filter:blur(8px)}
+.logo-big{width:140px;height:140px;border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.7);margin-bottom:8px}
+h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
+.subtitle{opacity:.8;margin:0;font-size:14px}
+
+/* LAYOUT */
+.menu{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.menu button{background:var(--card);color:#e5e7eb;border:1px solid var(--border);padding:16px;border-radius:16px;font-size:16px;text-align:left;transition:all .2s ease}
+.menu button:hover{border-color:var(--accent);transform:translateY(-1px)}
+.menu button span{float:right;opacity:.6}
+
+.card{background:rgba(2,6,23,0.92);border-radius:18px;padding:20px;margin-top:20px;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+.hidden{display:none}
+
+/* FORM */
+input,textarea{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb;font-size:15px}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+
+/* CHECKLIST PRO */
+label{display:flex;align-items:center;gap:12px;margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(15,23,42,.6);border:1px solid transparent;cursor:pointer;transition:.2s}
+label:hover{border-color:var(--accent)}
+label input[type="checkbox"]{width:18px;height:18px}
+label input[type="checkbox"]:checked+span,label input[type="checkbox"]:checked~span{color:var(--accent)}
+
+/* BUTTONS */
+button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#020617;border:none;padding:16px;border-radius:16px;font-size:16px;margin-top:20px;box-shadow:0 8px 20px rgba(34,211,238,.35);transition:.2s}
+button.primary:hover{transform:translateY(-1px)}
+
+/* HISTORIAL */
+#listaHistorial{list-style:none;padding:0;margin:0}
+#listaHistorial li{background:rgba(15,23,42,.7);border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:14px}
+#listaHistorial img{margin-top:8px}
+
+.footer{text-align:center;opacity:.6;font-size:13px;margin-top:40px}
+
+/* --- PRINT --- */
+@media print{
+  body{background:#fff;color:#000}
+  body::before,.menu,button,input,textarea,small,.volver{display:none!important}
+  .header{position:static;background:none}
+  .card{background:none;border:none;box-shadow:none}
+  img{max-width:100px}
+}
+</style>
+</head>
+<body dir="ltr">
+
+<!-- HEADER GLOBAL -->
+<div class="header">
+  <img src="./Mi_Man.png" class="logo-big" alt="MotoCare" />
+  <h1>MotoCare</h1>
+  <p class="subtitle">Control total de tu moto</p>
+</div>
+
+<!-- HOME / RESUMEN -->
+<div id="home">
+  <div id="resumen" class="card"></div>
+
+  <div class="menu">
+    <button data-target="moto">🏍️ Tu moto <span>›</span></button>
+    <button data-target="mantenimiento">🔧 Mantenimiento <span>›</span></button>
+    <button data-target="historial">📜 Historial <span>›</span></button>
+  </div>
+</div>
+
+<!-- TU MOTO -->
+<div id="moto" class="card hidden">
+  <h2>🏍️ Tu moto</h2>
+  <input id="marca" placeholder="Marca" />
+  <input id="modelo" placeholder="Modelo" />
+  <input id="anio" placeholder="Año" />
+  <input id="cilindrada" placeholder="Cilindrada (cc)" />
+  <input id="neumaticos" placeholder="Neumáticos" />
+  <input id="itv" placeholder="Próxima ITV (dd/mm/aaaa)" />
+  <button class="primary" id="guardarMoto">💾 Guardar moto</button>
+  <button class="primary volver">⬅ Volver</button>
+</div>
+
+<!-- MANTENIMIENTO -->
+<div id="mantenimiento" class="card hidden">
+  <h2>🔧 Mantenimiento</h2>
+  <input id="km" placeholder="Kilómetros actuales" />
+  <input id="fecha" placeholder="Fecha (dd/mm/aaaa)" />
+  <textarea id="obs" placeholder="Observaciones (hecho en esta revisión)"></textarea>
+  <textarea id="pendiente" placeholder="Pendiente / por cambiar en próxima revisión"></textarea>
+  <input type="file" id="fotos" accept="image/*" multiple capture="environment" />
+  <small style="opacity:.7">Puedes elegir fotos o hacerlas directamente con la cámara</small>
+  <label><input type="checkbox" class="rev" value="Aceite" />Aceite</label>
+  <label><input type="checkbox" class="rev" value="Filtro aceite" />Filtro aceite</label>
+  <label><input type="checkbox" class="rev" value="Filtro aire" />Filtro aire</label>
+  <label><input type="checkbox" class="rev" value="Cadena" />Cadena</label>
+  <label><input type="checkbox" class="rev" value="Frenos" />Frenos</label>
+  <label><input type="checkbox" class="rev" value="Neumáticos" />Neumáticos</label>
+  <label><input type="checkbox" class="rev" value="Cambio anticongelante" />Cambio de anticongelante</label>
+  <label><input type="checkbox" class="rev" value="Líquido de frenos" />Cambio de líquido de frenos</label>
+  <label><input type="checkbox" class="rev" value="Líquido de embrague" />Cambio de líquido de embrague</label>
+  <label><input type="checkbox" class="rev" value="Aceite caja de cambios" />Aceite de la caja de cambios</label>
+  <button class="primary" id="guardarRevision">💾 Guardar revisión</button>
+  <button class="primary volver">⬅ Volver</button>
+</div>
+
+<!-- HISTORIAL -->
+<div id="historial" class="card hidden">
+  <h2>📜 Historial</h2>
+  <ul id="listaHistorial"></ul>
+  <button class="primary" id="exportarPdf">📄 Exportar historial a PDF</button>
+  <button class="primary" id="enviarEmail">✉️ Enviar por email</button>
+  <button class="primary volver">⬅ Volver</button>
+</div>
+
+<div class="footer">MotoCare · App para particulares</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+
+  /* --- MIGRACIÓN SEGURA DE DATOS ANTIGUOS --- */
+  function normalizarHistorial(){
+    const h = JSON.parse(localStorage.getItem('historial') || '[]');
+    const normalizado = h.map(r => ({
+      km: r.km || '',
+      fecha: r.fecha || '',
+      obs: r.obs || '',
+      pendiente: r.pendiente || '',
+      revisiones: Array.isArray(r.revisiones) ? r.revisiones : [],
+      fotos: Array.isArray(r.fotos) ? r.fotos : []
+    }));
+    localStorage.setItem('historial', JSON.stringify(normalizado));
+    return normalizado;
+  }
+
+  function mostrar(id){
+    document.getElementById('home').classList.add('hidden');
+    ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function volver(){
+    ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
+    document.getElementById('home').classList.remove('hidden');
+    cargarResumen();
+  }
+
+  function onGuardarMoto(){
+    if(!marca.value || !modelo.value || !anio.value || !cilindrada.value || !neumaticos.value){
+      alert('Debes rellenar todos los datos de la moto antes de guardar');
+      return;
+    }
+
+    const moto = {
+      marca: marca.value.trim(),
+      modelo: modelo.value.trim(),
+      anio: anio.value.trim(),
+      cilindrada: cilindrada.value.trim(),
+      neumaticos: neumaticos.value.trim(),
+      itv: itv.value.trim()
+    };
+
+    localStorage.setItem('moto', JSON.stringify(moto));
+    alert('Moto guardada correctamente');
+    cargarResumen();
+  }
+
+  function onGuardarRevision(){
+    const moto = JSON.parse(localStorage.getItem('moto'));
+    if(!moto){ alert('Primero guarda los datos de la moto'); return; }
+
+    const revisiones = [...document.querySelectorAll('.rev:checked')].map(r=>r.value);
+    if(!km.value || !fecha.value || revisiones.length===0){
+      alert('Completa todos los datos y selecciona revisiones');
+      return;
+    }
+
+    const files = document.getElementById('fotos').files;
+    const leerFotos = () => new Promise(resolve => {
+      if(!files.length){ resolve([]); return; }
+      const fotos = [];
+      let cargadas = 0;
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          fotos.push(e.target.result);
+          cargadas++;
+          if(cargadas === files.length) resolve(fotos);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    leerFotos().then(fotosGuardadas => {
+      const data = {
+        km: km.value,
+        fecha: fecha.value,
+        obs: obs.value,
+        pendiente: pendiente.value,
+        revisiones,
+        fotos: fotosGuardadas
+      };
+
+      const h = normalizarHistorial();
+      h.push(data);
+      localStorage.setItem('historial', JSON.stringify(h));
+      alert('Revisión guardada');
+      cargarHistorial();
+    });
+  }
+
+  function cargarHistorial(){
+    const h = normalizarHistorial();
+    listaHistorial.innerHTML = h.map(r => {
+      const revs = r.revisiones.length ? r.revisiones.join(', ') : '—';
+      const fotosHtml = r.fotos.length ? r.fotos.map(f=>`<img src="${f}" style="width:60px;border-radius:6px;margin:4px"/>`).join('') : '';
+      return `<li><b>${r.fecha}</b> · ${r.km} km<br>
+      Revisiones: ${revs}<br>
+      Observaciones: ${r.obs}<br>
+      Pendiente: ${r.pendiente}<br>
+      ${fotosHtml}</li>`;
+    }).join('');
+  }
+
+  function cargarResumen(){
+    const moto = JSON.parse(localStorage.getItem('moto'));
+    const h = normalizarHistorial();
+    let html = '<h3>📊 Resumen</h3>';
+    if(moto){
+      html += `<p>${moto.marca} ${moto.modelo} (${moto.anio})</p>`;
+      if(moto.itv) html += `<p>ITV: ${moto.itv}</p>`;
+    }
+    if(h.length){
+      const ultima = h[h.length-1];
+      html += `<p>Última revisión: ${ultima.fecha} · ${ultima.km} km</p>`;
+      html += `<p>Próxima revisión estimada: ${Number(ultima.km)+10000} km</p>`;
+    }
+    resumen.innerHTML = html;
+  }
+
+  document.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>mostrar(b.dataset.target));
+  document.querySelectorAll('.volver').forEach(b=>b.onclick=volver);
+  document.getElementById('guardarMoto').onclick = onGuardarMoto;
+  document.getElementById('guardarRevision').onclick = onGuardarRevision;
+  document.getElementById('exportarPdf').onclick = () => window.print();
+  document.getElementById('enviarEmail').onclick = () => {
+    const moto = JSON.parse(localStorage.getItem('moto')) || {};
+    const subject = encodeURIComponent('Historial de mantenimiento de mi moto');
+    const body = encodeURIComponent(`Adjunto historial de mantenimiento.
+
+Moto: ${moto.marca||''} ${moto.modelo||''} (${moto.anio||''})`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  cargarResumen();
+  cargarHistorial();
+});
+</script>
+</body>
+</html>
