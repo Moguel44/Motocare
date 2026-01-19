@@ -1,3 +1,266 @@
+<!DOCTYPE html><html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#22d3ee">
+<title>MotoCare</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#0f172a;--card:#020617;--accent:#22d3ee;--muted:#94a3b8;--border:#334155}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#e5e7eb;margin:0;padding:16px;background:var(--bg);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background:rgba(2,6,23,.85);z-index:-1}
+.header{position:sticky;top:0;z-index:10;text-align:center;padding:20px 0;background:rgba(2,6,23,.95);backdrop-filter:blur(8px)}
+.logo-big{width:140px;height:140px;border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.7);margin-bottom:8px}
+h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
+.subtitle{opacity:.8;margin:0;font-size:14px}
+.menu{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.menu button{background:var(--card);color:#e5e7eb;border:1px solid var(--border);padding:16px;border-radius:16px;font-size:16px;text-align:left}
+.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px;position:relative;z-index:1}
+.hidden{display:none}
+input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
+label{display:flex;align-items:flex-start;gap:10px;margin:10px 0}
+label input[type="checkbox"]{margin-top:3px;flex:0 0 auto}
+.checklist{display:grid;grid-template-columns:1fr;row-gap:6px}
+@media (min-width:480px){.checklist{grid-template-columns:1fr 1fr;column-gap:16px}}
+button.primary{
+  background:linear-gradient(135deg,var(--accent),#38bdf8);
+  color:#020617;
+  border:none;
+  padding:16px;
+  border-radius:18px;
+  font-size:16px;
+  font-weight:600;
+  width:100%;
+  box-shadow:0 8px 20px rgba(34,211,238,.35);
+}.actions{ display:flex; flex-direction:column; gap:14px; margin-top:20px; }
+
+button.primary.danger{ background:linear-gradient(135deg,#ef4444,#991b1b); color:#fff; box-shadow:0 8px 20px rgba(239,68,68,.35); } #listaHistorial{list-style:none;padding:0} @media print{ body{background:#fff;color:#000} body::before,.menu,.volver,#btnPdf,#btnGuardarPdf,#btnEmail,select,.header{display:none!important} .card{box-shadow:none;border:none;margin:0;padding:0} h1,h2,h3{color:#000} #historial{display:block!important} #listaHistorial li{margin-bottom:12px} #pdfHeader{display:block!important} } /* ===== CHECKLIST ESTABLE (ANDROID + DESKTOP) ===== */ .checklist{ display:flex; flex-direction:column; gap:12px; margin-top:16px; } .check-item{ display:flex; align-items:center; gap:12px; width:100%; } .check-item input[type="checkbox"]{ width:22px; height:22px; flex-shrink:0; } .check-item span{ flex:1; font-size:16px; white-space:normal; }
+
+.checklist label{ display:flex; align-items:center; gap:12px; font-size:15px; line-height:1.4; color:#e5e7eb; } .checklist input[type="checkbox"]{ flex-shrink:0; width:20px; height:20px; }
+
+</style>
+</head>
+<body><div class="header">
+  <img src="./Mi_Man.png" class="logo-big" alt="MotoCare" />
+  <h1>MotoCare</h1>
+  <p class="subtitle">Control total de tu moto</p>
+</div><div id="home">
+  <div class="card">
+    <label>🏍️ Moto activa</label>
+    <select id="selectorMoto"></select>
+  </div>
+  <div id="resumen" class="card"></div>
+  <div class="menu">
+    <button data-target="moto">🏍️ Tu moto</button>
+    <button data-target="mantenimiento">🔧 Mantenimiento</button>
+    <button data-target="historial">📜 Historial</button>
+  </div>
+</div><div id="moto" class="card hidden">
+  <h2>🏍️ Tu moto</h2>
+  <input id="marca" placeholder="Marca" />
+  <input id="modelo" placeholder="Modelo" />
+  <input id="anio" placeholder="Año" />
+  <input id="cilindrada" placeholder="Cilindrada" />
+  <input id="neumaticos" placeholder="Neumáticos" />
+  <input id="itv" placeholder="ITV" />  <div style="display:flex;gap:12px;margin-top:16px">
+    <button class="primary" id="guardarMoto">💾 Guardar moto</button>
+    <button class="primary volver">↩️ Volver</button>
+  </div>  <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+    <button class="primary" id="btnNuevaMoto">➕ Nueva moto</button>
+    <button class="primary" id="btnEditarMoto">✏️ Editar moto</button>
+    <button class="primary danger" id="btnBorrarMoto">🗑️ Eliminar moto</button>
+  </div>
+</div><div id="mantenimiento" class="card hidden">
+  <h2>Mantenimiento</h2>
+  <input id="km" placeholder="Kilómetros" />
+  <input id="fecha" placeholder="Fecha" />
+  <textarea id="obs" placeholder="Observaciones"></textarea>
+  <textarea id="pendiente" placeholder="Pendiente"></textarea>
+  <div class="checklist">
+  <label class="check-item"><input type="checkbox" class="rev" value="Cambio de aceite"><span>Cambio de aceite</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Filtro de aceite"><span>Filtro de aceite</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Filtro de aire"><span>Filtro de aire</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Aceite caja de cambios"><span>Aceite caja de cambios</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Aceite embrague"><span>Aceite de embrague</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Pastillas de freno"><span>Pastillas de freno</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Liquido de frenos"><span>Líquido de frenos</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Bujias"><span>Bujías</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Anticongelante"><span>Anticongelante</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Cadena"><span>Cadena (engrase/tensado)</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Neumaticos"><span>Neumáticos</span></label>
+  <label class="check-item"><input type="checkbox" class="rev" value="Cambio de neumáticos"><span>Cambio de neumáticos</span></label>
+</div>
+  <div class="actions">
+    <button class="primary" id="guardarRevision">Guardar revisión</button>
+    <button class="primary volver">Volver</button>
+  </div>
+</div><div id="historial" class="card hidden">
+  <div id="pdfHeader" style="display:none;margin-bottom:16px;text-align:center">
+    <img src="./Mi_Man.png" alt="MotoCare" style="width:80px;height:80px;border-radius:16px;margin-bottom:8px" />
+    <h1 style="margin:0">MotoCare</h1>
+    <p id="pdfMotoDatos" style="margin:6px 0 0 0"></p>
+  </div>  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+    <button class="primary" id="btnPdf">📄 Exportar PDF</button>
+    <button class="primary" id="btnGuardarPdf">💾 Guardar PDF</button>
+    <button class="primary" id="btnEmail">✉️ Enviar por correo</button>
+  </div>  <h2>Historial</h2>
+  <ul id="listaHistorial"></ul>
+<p id="historialVacio" style="opacity:.7"></p>
+  <button class="primary volver">Volver</button>
+</div><script>
+document.addEventListener('DOMContentLoaded', function () {
+  const $ = id => document.getElementById(id);
+  const getMotos = () => JSON.parse(localStorage.getItem('motos') || '[]');
+  const setMotos = m => localStorage.setItem('motos', JSON.stringify(m));
+  const getActiva = () => getMotos().find(m => m.id === localStorage.getItem('motoActivaId'));
+
+  function actualizarSelector() {
+    const s = $('selectorMoto');
+    const motos = getMotos();
+    const act = localStorage.getItem('motoActivaId');
+    s.innerHTML = motos.map(m => `<option value="${m.id}" ${m.id === act ? 'selected' : ''}>${m.datos.marca} ${m.datos.modelo}</option>`).join('');
+  }
+
+  function cargarResumen() {
+    const r = $('resumen');
+    const m = getActiva();
+    if (!m) { r.innerHTML = '<p>No hay moto</p>'; return; }
+    r.innerHTML = `<h3>${m.datos.marca} ${m.datos.modelo}</h3>`;
+    renderHistorial();
+  }
+
+  function renderHistorial(){
+    const ul=$('listaHistorial');
+    const vacio=$('historialVacio');
+    ul.innerHTML='';
+    const m=getActiva();
+    if(!m||!m.historial||m.historial.length===0){
+      vacio.innerText='No hay revisiones guardadas';
+      return;
+    }
+    vacio.innerText='';
+    m.historial.forEach((r,i)=>{
+      const li=document.createElement('li');
+      li.style.marginBottom='12px';
+      li.innerHTML=`<strong>${r.fecha}</strong> · ${r.km} km<br>
+      ${r.revisiones.join(', ')}<br>
+      <button data-i="${i}" class="editRev">✏️ Editar</button>
+      <button data-i="${i}" class="delRev">🗑️ Eliminar</button>`;
+      ul.appendChild(li);
+    });
+    ul.querySelectorAll('.editRev').forEach(b=>b.onclick=editarRevision);
+    ul.querySelectorAll('.delRev').forEach(b=>b.onclick=eliminarRevision);
+  }
+    r.innerHTML = `<h3>${m.datos.marca} ${m.datos.modelo}</h3>`;
+  }
+
+  function mostrar(id) {
+    ['home', 'moto', 'mantenimiento', 'historial'].forEach(s => $(s).classList.add('hidden'));
+    $(id).classList.remove('hidden');
+  }
+
+  function volver() {
+    mostrar('home');
+    cargarResumen();
+  }
+
+  function prepararPdf(){
+    const m=getActiva();
+    if(!m) return;
+    $('pdfMotoDatos').innerText = `${m.datos.marca} ${m.datos.modelo} · ${m.datos.anio||''} · ${m.datos.cilindrada||''}`;
+  }
+
+  function generarTextoHistorial(){
+    const m=getActiva();
+    if(!m) return 'Sin datos';
+    let txt=`Moto: ${m.datos.marca} ${m.datos.modelo}\n`;
+    (m.historial||[]).forEach((r,i)=>{
+      txt+=`\n#${i+1} - ${r.fecha||''} - ${r.km||''} km`;
+    });
+    return txt;
+  }
+
+  $('btnPdf').onclick=()=>{ prepararPdf(); window.print(); };
+  $('btnGuardarPdf').onclick=()=>{ prepararPdf(); alert('Elige Guardar como PDF'); window.print(); };
+  $('btnEmail').onclick=()=>{
+    const body=encodeURIComponent(generarTextoHistorial());
+    window.location.href=`mailto:?subject=Historial MotoCare&body=${body}`;
+  };
+
+  document.querySelectorAll('.menu button').forEach(b => b.onclick = () => mostrar(b.dataset.target));
+  document.querySelectorAll('.volver').forEach(b => b.onclick = volver);
+
+  $('btnNuevaMoto').onclick = () => {
+    ['marca','modelo','anio','cilindrada','neumaticos','itv'].forEach(i => $(i).value='');
+  };
+
+  let editIndex=null;
+
+  $('guardarRevision').onclick = () => {
+    const m = getActiva();
+    if(!m) return alert('No hay moto activa');
+    if(!$('km').value || !$('fecha').value) return alert('Kilómetros y fecha obligatorios');
+    const revisiones = [...document.querySelectorAll('.rev:checked')].map(c=>c.value);
+    if(revisiones.length===0) return alert('Selecciona al menos una revisión');
+
+    const data={
+      km:$('km').value,
+      fecha:$('fecha').value,
+      obs:$('obs').value,
+      pendiente:$('pendiente').value,
+      revisiones
+    };
+
+    if(editIndex!==null){
+      m.historial[editIndex]=data;
+      editIndex=null;
+    }else{
+      m.historial.push(data);
+    }
+
+    setMotos(getMotos().map(x=>x.id===m.id?m:x));
+    ['km','fecha','obs','pendiente'].forEach(i=>$(i).value='');
+    document.querySelectorAll('.rev').forEach(c=>c.checked=false);
+    alert('Revisión guardada');
+    volver();
+  };
+
+  function editarRevision(e){
+    const i=+e.target.dataset.i;
+    const m=getActiva();
+    const r=m.historial[i];
+    editIndex=i;
+    $('km').value=r.km;
+    $('fecha').value=r.fecha;
+    $('obs').value=r.obs||'';
+    $('pendiente').value=r.pendiente||'';
+    document.querySelectorAll('.rev').forEach(c=>c.checked=r.revisiones.includes(c.value));
+    mostrar('mantenimiento');
+  }
+
+  function eliminarRevision(e){
+    if(!confirm('¿Eliminar esta revisión?')) return;
+    const i=+e.target.dataset.i;
+    const m=getActiva();
+    m.historial.splice(i,1);
+    setMotos(getMotos().map(x=>x.id===m.id?m:x));
+    renderHistorial();
+  }
+
+  $('guardarMoto').onclick = () => {
+    if (!$('marca').value) return alert('Marca requerida');
+    const motos = getMotos();
+    const nueva = {
+      id: crypto.randomUUID(),
+      datos: {
+        marca:$('marca').value,
+        modelo:$('modelo').value,
+        anio:$('anio').value,
+        cilindrada:$('cilindrada').value,
+        neumaticos:$('neumaticos').value,
+        itv:$('itv').value
+      },
+      historial: []
     };
     motos.push(nueva);
     setMotos(motos);
@@ -17,4 +280,4 @@
 </script><!-- NOTA: El registro del Service Worker se elimina aquí para evitar SecurityError
      en entornos restringidos (sandbox, vista previa, algunos navegadores).
      En producción (GitHub Pages / HTTPS real) se debe registrar en un archivo separado. --></body>
-</html>
+    </html>
