@@ -75,6 +75,10 @@ button.primary:hover{transform:translateY(-1px)}
 
 <!-- HOME / RESUMEN -->
 <div id="home">
+  <div class="card" style="margin-top:0">
+    <label style="margin:0 0 8px 0">🏍️ Moto activa</label>
+    <select id="selectorMoto" style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:#e5e7eb;font-size:15px"></select>
+  </div>
   <div id="resumen" class="card"></div>
 
   <div class="menu">
@@ -168,7 +172,7 @@ function getMotoActiva(){
   return getMotos().find(m=>m.id===id);
 }
 
-function setMotoActiva(id){ localStorage.setItem('motoActivaId',id); }
+function setMotoActiva(id){ localStorage.setItem('motoActivaId',id); actualizarSelector(); }
 
 /* =====================
    NAVEGACIÓN
@@ -266,12 +270,39 @@ function cargarResumen(){
   if(!moto){ resumen.innerHTML='<p>No hay moto guardada</p>'; return; }
   const h = moto.historial;
   let html = `<h3>${moto.datos.marca} ${moto.datos.modelo}</h3>`;
+  html += `<p>${moto.datos.cilindrada} cc · ${moto.datos.neumaticos}</p>`;
+  if(moto.datos.itv) html += `<p>ITV: ${moto.datos.itv}</p>`;
+  if(h.length){
+    const u=h[h.length-1];
+    html+=`<p>Última revisión: ${u.fecha} · ${u.km} km</p>`;
+  } else {
+    html+=`<p>Sin revisiones registradas</p>`;
+  }
+  resumen.innerHTML=html;
+}
+  const h = moto.historial;
+  let html = `<h3>${moto.datos.marca} ${moto.datos.modelo}</h3>`;
   if(h.length){
     const u=h[h.length-1];
     html+=`<p>Última revisión: ${u.fecha} · ${u.km} km</p>`;
   }
   resumen.innerHTML=html;
 }
+
+function actualizarSelector(){
+  const selector = document.getElementById('selectorMoto');
+  if(!selector) return;
+  const motos = getMotos();
+  const activa = localStorage.getItem('motoActivaId');
+  selector.innerHTML = motos.map(m=>`<option value="${m.id}" ${m.id===activa?'selected':''}>${m.datos.marca} ${m.datos.modelo}</option>`).join('');
+}
+
+selectorMoto.onchange = () => {
+  setMotoActiva(selectorMoto.value);
+  actualizarSelector();
+  cargarResumen();
+  cargarHistorial();
+};
 
 /* =====================
    INIT
