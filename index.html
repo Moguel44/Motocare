@@ -56,12 +56,21 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
 
 <div id="moto" class="card hidden">
   <h2>🏍️ Tu moto</h2>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
+  <input id="marca" placeholder="Marca" />
+  <input id="modelo" placeholder="Modelo" />
+  <input id="anio" placeholder="Año" />
+  <input id="cilindrada" placeholder="Cilindrada" />
+  <input id="neumaticos" placeholder="Neumáticos" />
+  <input id="itv" placeholder="ITV" />
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
+    <button class="primary" id="guardarMoto">💾 Guardar moto</button>
+    <button class="primary volver">↩️ Volver</button>
     <button class="primary" id="btnNuevaMoto">➕ Nueva moto</button>
     <button class="primary" id="btnEditarMoto">✏️ Editar moto</button>
     <button class="primary" id="btnBorrarMoto" style="background:#7f1d1d">🗑️ Eliminar</button>
   </div>
-  <input id="marca" placeholder="Marca" />
+ placeholder="Marca" />
   <input id="modelo" placeholder="Modelo" />
   <input id="anio" placeholder="Año" />
   <input id="cilindrada" placeholder="Cilindrada" />
