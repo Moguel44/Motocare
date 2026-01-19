@@ -22,6 +22,15 @@ input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-
 label{display:flex;align-items:center;gap:12px;margin:10px 0}
 button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#020617;border:none;padding:16px;border-radius:16px;font-size:16px;margin-top:20px}
 #listaHistorial{list-style:none;padding:0}
+@media print{
+  body{background:#fff;color:#000}
+  body::before,.menu,.volver,#btnPdf,#btnGuardarPdf,#btnEmail,select,.header{display:none!important}
+  .card{box-shadow:none;border:none;margin:0;padding:0}
+  h1,h2,h3{color:#000}
+  #historial{display:block!important}
+  #listaHistorial li{margin-bottom:12px}
+  #pdfHeader{display:block!important}
+}
 </style>
 </head>
 <body>
@@ -47,7 +56,7 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
 
 <div id="moto" class="card hidden">
   <h2>🏍️ Tu moto</h2>
-  <div style="display:flex;gap:12px">
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
     <button class="primary" id="btnNuevaMoto">➕ Nueva moto</button>
     <button class="primary" id="btnEditarMoto">✏️ Editar moto</button>
     <button class="primary" id="btnBorrarMoto" style="background:#7f1d1d">🗑️ Eliminar</button>
@@ -75,6 +84,17 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
 </div>
 
 <div id="historial" class="card hidden">
+  <!-- CABECERA PDF (solo impresión) -->
+  <div id="pdfHeader" style="display:none;margin-bottom:16px;text-align:center">
+    <img src="./Mi_Man.png" alt="MotoCare" style="width:80px;height:80px;border-radius:16px;margin-bottom:8px" />
+    <h1 style="margin:0">MotoCare</h1>
+    <p id="pdfMotoDatos" style="margin:6px 0 0 0"></p>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+    <button class="primary" id="btnPdf">📄 Exportar PDF</button>
+    <button class="primary" id="btnGuardarPdf">💾 Guardar PDF</button>
+    <button class="primary" id="btnEmail">✉️ Enviar por correo</button>
+  </div>
   <h2>Historial</h2>
   <ul id="listaHistorial"></ul>
   <button class="primary volver">Volver</button>
@@ -110,6 +130,37 @@ document.addEventListener('DOMContentLoaded', function () {
     mostrar('home');
     cargarResumen();
   }
+
+  function prepararPdf(){
+    const m=getActiva();
+    if(!m) return;
+    $('pdfMotoDatos').innerText = `${m.datos.marca} ${m.datos.modelo} · ${m.datos.anio||''} · ${m.datos.cilindrada||''}`;
+  }
+
+  function generarTextoHistorial(){
+    const m=getActiva();
+    if(!m) return 'Sin datos';
+    let txt=`Moto: ${m.datos.marca} ${m.datos.modelo}
+`;
+    (m.historial||[]).forEach((r,i)=>{
+      txt+=`
+#${i+1} - ${r.fecha||''} - ${r.km||''} km`;
+    });
+    return txt;
+  }
+
+  $('btnPdf') && ($('btnPdf').onclick=()=>{ prepararPdf(); window.print(); });
+
+  // Guardar PDF (usa diálogo nativo de Android / navegador)
+  $('btnGuardarPdf') && ($('btnGuardarPdf').onclick=()=>{
+    prepararPdf();
+    alert('Se abrirá el diálogo del sistema. Elige "Guardar como PDF" para almacenarlo en tu móvil.');
+    window.print();
+  });
+  $('btnEmail') && ($('btnEmail').onclick=()=>{
+    const body=encodeURIComponent(generarTextoHistorial());
+    location.href=`mailto:?subject=Historial MotoCare&body=${body}`;
+  });
 
   document.querySelectorAll('.menu button').forEach(b => b.onclick = () => mostrar(b.dataset.target));
   document.querySelectorAll('.volver').forEach(b => b.onclick = volver);
