@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#22d3ee">
 <title>MotoCare</title>
+<link rel="manifest" href="manifest.json">
 <style>
 :root{
   --bg:#0f172a;
@@ -131,6 +133,21 @@ button.primary:hover{transform:translateY(-1px)}
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
+
+  // --- PWA INSTALL PROMPT (ANDROID) ---
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('PWA instalable');
+  });
+
+  // Registrar Service Worker (PWA)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').then(() => {
+      console.log('Service Worker registrado');
+    });
+  }
 
   /* --- MIGRACIÓN SEGURA DE DATOS ANTIGUOS --- */
   function normalizarHistorial(){
