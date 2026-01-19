@@ -205,7 +205,7 @@ function mostrar(id){
   ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
-}
+
 function volver(){
   ['moto','mantenimiento','historial'].forEach(s=>document.getElementById(s).classList.add('hidden'));
   document.getElementById('home').classList.remove('hidden');
@@ -267,6 +267,8 @@ document.getElementById('guardarMoto').onclick = () => {
     alert('Debes rellenar todos los datos de la moto'); return;
   }
   const motos = getMotos();
+  let activaId = localStorage.getItem('motoActivaId');
+
   if(modoMoto==='editar'){
     const moto = getMotoActiva();
     moto.datos = { marca: marca.value, modelo: modelo.value, anio: anio.value, cilindrada: cilindrada.value, neumaticos: neumaticos.value, itv: itv.value };
@@ -277,10 +279,11 @@ document.getElementById('guardarMoto').onclick = () => {
       historial: []
     };
     motos.push(nueva);
-    setMotoActiva(nueva.id);
+    activaId = nueva.id;
   }
+
   setMotos(motos);
-  setMotoActiva(nueva.id);
+  if(activaId) setMotoActiva(activaId);
 
   // LIMPIAR FORMULARIO
   marca.value=''; modelo.value=''; anio.value=''; cilindrada.value=''; neumaticos.value=''; itv.value='';
@@ -379,3 +382,4 @@ cargarHistorial();
 </script>
 </body>
 </html>
+l>
