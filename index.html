@@ -138,6 +138,14 @@ button.primary:hover{transform:translateY(-1px)}
 <script>
 window.addEventListener('DOMContentLoaded', () => {
 
+// REGISTRO SERVICE WORKER (forzar actualización)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js?v=2.1').then(reg => {
+    reg.update();
+  });
+}
+
+
 /* =====================
    MODELO MULTI-MOTO v2
    ===================== */
@@ -287,6 +295,7 @@ function actualizarSelector(){
 
 selectorMoto.onchange = () => {
   setMotoActiva(selectorMoto.value);
+  actualizarSelector();
   actualizarSelector();
   cargarResumen();
   cargarHistorial();
