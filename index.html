@@ -61,11 +61,12 @@ button.danger{
   background:#991b1b;
   color:#fff;
   border:none;
-  padding:8px 12px;
+  padding:6px 10px;
   border-radius:12px;
+  cursor:pointer;
 }
 
-/* CHECKLIST */
+/* Checklist */
 .check-item{
   display:grid;
   grid-template-columns:26px 1fr;
@@ -91,39 +92,6 @@ button.danger{
 }
 .toast.show{opacity:1}
 .toast.error{border-color:#dc2626}
-
-/* Modal */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.modal.hidden{display:none}
-.modal-card{
-  background:#020617;
-  padding:20px;
-  border-radius:18px;
-  max-width:360px;
-  width:90%;
-}
-.modal-actions{
-  display:flex;
-  gap:12px;
-  margin-top:16px;
-}
-.modal-actions button{
-  flex:1;
-  padding:12px;
-  border-radius:14px;
-}
-.modal-actions .confirm{
-  background:#991b1b;
-  color:#fff;
-  border:none;
-}
 </style>
 </head>
 
@@ -201,8 +169,8 @@ button.danger{
 
 <!-- HISTORIAL -->
 <div id="historial" class="card hidden">
-  <h2>Historial</h2>
-  <ul id="listaHistorial"></ul>
+  <h2>Historial de mantenimiento</h2>
+  <ul id="listaHistorial" style="list-style:none;padding:0"></ul>
   <button class="primary" id="volverHistorial">⬅️ Volver</button>
 </div>
 
@@ -230,16 +198,24 @@ document.addEventListener('DOMContentLoaded',()=>{
   function cargar(){
     const ul=$('listaMotos'); ul.innerHTML='';
     const sel=$('motoSeleccionada');
-    sel.innerHTML='<option value=\"\">Selecciona una moto</option>';
+    sel.innerHTML='<option value="">Selecciona una moto</option>';
+
     getMotos().forEach(m=>{
       const li=document.createElement('li');
       li.style.display='flex';
       li.style.justifyContent='space-between';
-      li.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
+      li.style.alignItems='center';
+      li.innerHTML=`<span>${m.datos.marca} ${m.datos.modelo||''}</span>`;
+      const b=document.createElement('button');
+      b.className='danger';
+      b.textContent='🗑️';
+      b.onclick=()=>eliminarMoto(m.id);
+      li.appendChild(b);
       ul.appendChild(li);
+
       const o=document.createElement('option');
       o.value=m.id;
-      o.textContent=li.textContent;
+      o.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
       sel.appendChild(o);
     });
   }
@@ -252,7 +228,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       marca:marca.value,modelo:modelo.value,anio:anio.value,
       cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
     },historial:[]});
-    setMotos(motos); campos.forEach(c=>$(c).value='');
+    setMotos(motos);
+    campos.forEach(c=>$(c).value='');
     cargar(); show('home');
   }
 
@@ -285,16 +262,25 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c=>c.checked=false);
 
     toast('Revisión guardada');
-    cargarHistorial();
     show('home');
   }
 
   function cargarHistorial(){
     const ul=$('listaHistorial'); ul.innerHTML='';
-    getMotos().forEach(m=>{
+    const motos=getMotos();
+    if(!motos.some(m=>m.historial.length)){
+      ul.innerHTML='<li>No hay revisiones registradas</li>';
+      return;
+    }
+    motos.forEach(m=>{
       m.historial.forEach(r=>{
         const li=document.createElement('li');
-        li.innerHTML=`<strong>${m.datos.marca}</strong> – ${r.fecha} (${r.km} km)<br>${r.trabajos.join(', ')}`;
+        li.style.marginBottom='12px';
+        li.innerHTML=`
+          <strong>${m.datos.marca} ${m.datos.modelo||''}</strong><br>
+          📅 ${r.fecha} · 🛣️ ${r.km} km<br>
+          🛠️ ${r.trabajos.join(', ')||'Sin checklist'}
+        `;
         ul.appendChild(li);
       });
     });
