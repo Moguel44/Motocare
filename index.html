@@ -7,45 +7,46 @@
 <title>MotoCare</title>
 <link rel="manifest" href="manifest.json">
 <style>
-:root{--bg:#0f172a;--card:#020617;--accent:#22d3ee;--border:#334155}
+:root{--bg:#0b1220;--card:#020617;--accent:#7dd3fc;--border:#1e293b}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#e5e7eb;margin:0;padding:16px;background:var(--bg);min-height:100vh}
-body::before{content:"";position:fixed;inset:0;background:rgba(2,6,23,.85);z-index:-1}
-.header{position:sticky;top:0;z-index:10;text-align:center;padding:20px 0;background:rgba(2,6,23,.95);backdrop-filter:blur(8px)}
-.logo-big{width:140px;height:140px;border-radius:28px;box-shadow:0 12px 30px rgba(0,0,0,.7);margin-bottom:8px}
-h1{color:var(--accent);margin:6px 0 4px 0;font-size:28px}
-.subtitle{opacity:.8;margin:0;font-size:14px}
-.menu{display:flex;flex-direction:column;gap:14px;margin-top:24px}
-@media(min-width:768px){.menu{flex-direction:row}}
-.menu button{background:var(--card);color:#e5e7eb;border:1px solid var(--border);padding:16px;border-radius:16px;font-size:16px;text-align:left}
-.card{background:rgba(2,6,23,.92);border-radius:18px;padding:20px;margin-top:20px;max-width:720px;margin-left:auto;margin-right:auto}
+.header{text-align:center;padding:20px 0}
+.logo-big{width:120px;height:120px;border-radius:24px;box-shadow:0 8px 20px rgba(0,0,0,.6)}
+h1{color:var(--accent);margin:10px 0}
+.card{background:rgba(2,6,23,.95);border-radius:18px;padding:20px;margin:16px auto;max-width:720px}
 .hidden{display:none}
-input,textarea,select{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
-button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#020617;border:none;padding:16px;border-radius:18px;font-size:16px;font-weight:600;width:100%;margin-top:12px}
-.actions{display:flex;flex-direction:column;gap:14px;margin-top:20px}
-.checklist{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.check-item{display:flex;align-items:center;gap:12px}
-.check-item span{flex:1}
-#listaHistorial{list-style:none;padding:0}
+.menu{display:flex;flex-direction:column;gap:14px}
+.menu button{padding:16px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:#e5e7eb;font-size:16px}
+input,textarea,select{width:100%;padding:14px;border-radius:12px;border:1px solid var(--border);margin-top:12px;background:var(--card);color:#e5e7eb}
+input.error,select.error{border:2px solid #dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.3)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+button.primary{padding:14px;border-radius:22px;border:2px solid transparent;background:linear-gradient(#111827,#020617) padding-box,linear-gradient(135deg,#c9a227,#7c3aed) border-box;color:#fff;font-weight:600}
+button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:8px 14px;border-radius:14px}
+.check-item{display:flex;align-items:center;gap:12px;margin-top:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1f2937,#020617);border:1px solid var(--border);color:#e5e7eb;padding:14px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s}
+.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
+.toast.error{border:1px solid #dc2626}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal.hidden{display:none}
+.modal-card{background:#020617;border-radius:18px;padding:20px;max-width:360px;width:90%;border:1px solid var(--border)}
+.modal-actions{display:flex;gap:12px;margin-top:16px}
+.modal-actions button{flex:1;padding:12px;border-radius:14px;font-weight:600}
+.modal-actions .cancel{background:#111827;color:#e5e7eb;border:1px solid var(--border)}
+.modal-actions .confirm{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <img src="./Mi_Man.png" class="logo-big" alt="MotoCare" />
+  <img src="Mi_Man.png" class="logo-big" alt="MotoCare" />
   <h1>MotoCare</h1>
-  <p class="subtitle">Control total de tu moto</p>
 </div>
 
-<div id="home">
-  <div class="card">
-    <label>Moto activa</label>
-    <select id="selectorMoto"></select>
-  </div>
-  <div id="resumen" class="card"></div>
+<div id="home" class="card">
+  <h2>Motos registradas</h2>
+  <ul id="listaMotos" style="list-style:none;padding:0"></ul>
   <div class="menu">
-    <button data-target="moto">Tu moto</button>
-    <button data-target="mantenimiento">Mantenimiento</button>
-    <button data-target="historial">Historial</button>
+    <button id="btnMoto">Añadir / Editar moto</button>
+    <button id="btnMantenimiento">Mantenimiento</button>
+    <button id="btnHistorial">Historial</button>
   </div>
 </div>
 
@@ -56,102 +57,183 @@ button.primary{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0
   <input id="anio" placeholder="Año" />
   <input id="cilindrada" placeholder="Cilindrada" />
   <input id="neumaticos" placeholder="Neumáticos" />
-  <input id="itv" placeholder="ITV" />
+  <label>Fecha ITV</label>
+  <input id="itv" type="date" />
   <div class="actions">
-    <button class="primary" id="guardarMoto">Guardar moto</button>
-    <button class="primary" id="nuevaMoto">Nueva moto</button>
-    <button class="primary volver">Volver</button>
+    <button class="primary" id="guardarMoto">💾 Guardar</button>
+    <button class="primary" id="volverMoto">⬅️ Volver</button>
   </div>
 </div>
 
 <div id="mantenimiento" class="card hidden">
   <h2>Mantenimiento</h2>
+  <label>Moto</label>
+  <select id="motoSeleccionada">
+    <option value="">Selecciona una moto</option>
+  </select>
   <input id="km" placeholder="Kilómetros" />
-  <input id="fecha" placeholder="Fecha" />
+  <label>Fecha mantenimiento</label>
+  <input id="fecha" type="date" />
   <textarea id="obs" placeholder="Observaciones"></textarea>
-  <textarea id="pendiente" placeholder="Pendiente"></textarea>
-  <div class="checklist">
-    <label class="check-item"><input type="checkbox" class="rev" value="Cambio de aceite"><span>Cambio de aceite</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Filtro de aceite"><span>Filtro de aceite</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Filtro de aire"><span>Filtro de aire</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Bujias"><span>Bujías</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Pastillas de freno"><span>Pastillas de freno</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Liquido de frenos"><span>Líquido de frenos</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Anticongelante"><span>Anticongelante</span></label>
-    <label class="check-item"><input type="checkbox" class="rev" value="Cambio de neumáticos"><span>Cambio de neumáticos</span></label>
-  </div>
+  <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>
+
+  <h3>🛢️ Motor y transmisión</h3>
+  <div class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</div>
+  <div class="check-item"><input type="checkbox" value="FiltroAceite">Filtro de aceite</div>
+  <div class="check-item"><input type="checkbox" value="Bujias">Cambio de bujías</div>
+  <div class="check-item"><input type="checkbox" value="Valvulas">Reglaje de válvulas</div>
+  <div class="check-item"><input type="checkbox" value="AceiteCaja">Aceite caja de cambios</div>
+  <div class="check-item"><input type="checkbox" value="AceiteEmbrague">Aceite embrague</div>
+
+  <h3>🛑 Frenos</h3>
+  <div class="check-item"><input type="checkbox" value="PastillasDel">Pastillas delanteras</div>
+  <div class="check-item"><input type="checkbox" value="PastillasTras">Pastillas traseras</div>
+  <div class="check-item"><input type="checkbox" value="LiquidoFrenos">Líquido de frenos</div>
+
+  <h3>🌡️ Refrigeración</h3>
+  <div class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</div>
+
+  <h3>🛠️ Suspensión</h3>
+  <div class="check-item"><input type="checkbox" value="Horquilla">Aceite horquillas delanteras</div>
+
   <div class="actions">
-    <button class="primary" id="guardarRevision">Guardar revisión</button>
-    <button class="primary volver">Volver</button>
+    <button class="primary" id="guardarRevision">💾 Guardar</button>
+    <button class="primary" id="volverMantenimiento">⬅️ Volver</button>
+  </div>
+</div>
+
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>Eliminar moto</h3>
+    <p id="confirmText"></p>
+    <div class="modal-actions">
+      <button class="cancel" id="cancelDelete">Cancelar</button>
+      <button class="confirm" id="confirmDelete">Eliminar</button>
+    </div>
   </div>
 </div>
 
 <div id="historial" class="card hidden">
   <h2>Historial</h2>
-  <ul id="listaHistorial"></ul>
-  <button class="primary volver">Volver</button>
+  <ul id="listaHistorial" style="list-style:none;padding:0"></ul>
+  <button class="primary" id="volverHistorial">⬅️ Volver</button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const $ = id => document.getElementById(id);
-  const getMotos = () => JSON.parse(localStorage.getItem('motos') || '[]');
-  const setMotos = m => localStorage.setItem('motos', JSON.stringify(m));
-  const getActiva = () => getMotos().find(m => m.id === localStorage.getItem('motoActivaId'));
+document.addEventListener('DOMContentLoaded',()=>{
+  const $=id=>document.getElementById(id);
+  const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
+  const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
 
   function mostrar(id){
     ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
     $(id).classList.remove('hidden');
+    if(id==='historial') cargarHistorial();
   }
-
-  document.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>mostrar(b.dataset.target));
-  document.querySelectorAll('.volver').forEach(b=>b.onclick=()=>mostrar('home'));
-
-  $('guardarMoto').onclick = () => {
-    if(!$('marca').value) return alert('Marca requerida');
-    const motos=getMotos();
-    const moto={
-      id:(window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'moto-'+Date.now()+Math.random().toString(16).slice(2),
-      datos:{marca:$('marca').value,modelo:$('modelo').value},
-      historial:[]
-    };
-    motos.push(moto);
-    setMotos(motos);
-    localStorage.setItem('motoActivaId', moto.id);
-    cargar();
-    mostrar('home');
-  };
-
-  $('guardarRevision').onclick = () => {
-    const m=getActiva();
-    if(!m) return alert('No hay moto');
-    const revs=[...document.querySelectorAll('.rev:checked')].map(c=>c.value);
-    if(!revs.length) return alert('Marca al menos una revisión');
-    m.historial.push({km:$('km').value,fecha:$('fecha').value,revs});
-    setMotos(getMotos().map(x=>x.id===m.id?m:x));
-    cargar();
-    mostrar('home');
-  };
+  function toast(msg,err){const t=document.createElement('div');t.className='toast'+(err?' error':'');t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},3000)}
 
   function cargar(){
-    const s=$('selectorMoto');
+    const ul=$('listaMotos');ul.innerHTML='';
+    const sel=$('motoSeleccionada');sel.innerHTML='<option value="">Selecciona una moto</option>';
     const motos=getMotos();
-    s.innerHTML=motos.map(m=>`<option value="${m.id}">${m.datos.marca} ${m.datos.modelo}</option>`).join('');
-    const m=getActiva();
-    $('resumen').innerHTML=m?`<h3>${m.datos.marca} ${m.datos.modelo}</h3>`:'';
-    const ul=$('listaHistorial');
-    ul.innerHTML='';
-    if(m) m.historial.forEach(r=>{
-      const li=document.createElement('li');
-      li.textContent=`${r.fecha||''} - ${r.km||''} km - ${r.revs.join(', ')}`;
-      ul.appendChild(li);
+    if(!motos.length){ul.innerHTML='<li>No hay motos registradas</li>';return;}
+    motos.forEach(m=>{
+      const li=document.createElement('li');li.style.display='flex';li.style.justifyContent='space-between';
+      const s=document.createElement('span');s.textContent=m.datos.marca+' '+(m.datos.modelo||'');
+      const b=document.createElement('button');b.className='danger';b.textContent='🗑️';b.onclick=()=>eliminarMoto(m.id);
+      li.append(s,b);ul.appendChild(li);
+      const o=document.createElement('option');o.value=m.id;o.textContent=s.textContent;sel.appendChild(o);
     });
   }
 
-  $('selectorMoto').onchange=e=>{localStorage.setItem('motoActivaId', e.target.value);cargar();};
+  function guardarMoto(){
+    const campos=['marca','modelo','anio','cilindrada','neumaticos','itv'];
+    let ok=true;campos.forEach(c=>{$(c).classList.remove('error');if(!$(c).value){$(c).classList.add('error');ok=false;}});
+    if(!ok){toast('⚠️ Rellena todos los campos',true);return;}
+    const motos=getMotos();motos.push({id:'m'+Date.now(),datos:{marca:marca.value,modelo:modelo.value,anio:anio.value,cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value},historial:[]});
+    setMotos(motos);campos.forEach(c=>$(c).value='');toast('✅ Moto guardada');cargar();mostrar('home');
+  }
+
+  let pend=null;
+  function eliminarMoto(id){const m=getMotos().find(x=>x.id===id);if(!m){toast('Moto no encontrada',true);return;}pend=id;confirmText.textContent=`Eliminar ${m.datos.marca} ${m.datos.modelo||''} y su historial?`;confirmModal.classList.remove('hidden');}
+
+  confirmDelete.onclick=()=>{if(!pend)return;setMotos(getMotos().filter(m=>m.id!==pend));pend=null;confirmModal.classList.add('hidden');toast('🗑️ Moto eliminada');cargar();};
+  cancelDelete.onclick=()=>{pend=null;confirmModal.classList.add('hidden');};
+
+  function cargarHistorial(){
+    const ul = $('listaHistorial');
+    ul.innerHTML = '';
+    const motos = getMotos();
+    if(!motos.length){ ul.innerHTML='<li>No hay motos</li>'; return; }
+
+    motos.forEach(m=>{
+      if(!m.historial || !m.historial.length) return;
+      const h=document.createElement('li');
+      h.style.marginBottom='16px';
+      h.innerHTML = `<strong>${m.datos.marca} ${m.datos.modelo||''}</strong>`;
+      ul.appendChild(h);
+
+      m.historial.forEach(r=>{
+        const li=document.createElement('li');
+        li.style.marginLeft='16px';
+        li.style.marginTop='6px';
+        li.innerHTML = `🛠️ ${r.fecha} – ${r.km} km<br><small>${r.trabajos.join(', ')||'Sin checklist'}</small>`;
+        ul.appendChild(li);
+      });
+    });
+  }
+
+  function guardarRevision(){
+    const sel = $('motoSeleccionada');
+    const kmEl = $('km');
+    const fechaEl = $('fecha');
+    const obsEl = $('obs');
+    const pendEl = $('pendiente');
+
+    if(!sel.value || !kmEl.value || !fechaEl.value){
+      toast('⚠️ Completa moto, km y fecha',true);
+      return;
+    }
+
+    const motos = getMotos();
+    const m = motos.find(x => x.id === sel.value);
+    if(!m){ toast('Moto no válida', true); return; }
+
+    const trabajos = [...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')]
+      .map(c => c.value);
+
+    m.historial.push({
+      km: kmEl.value,
+      fecha: fechaEl.value,
+      obs: obsEl.value,
+      pendiente: pendEl.value,
+      trabajos
+    });
+
+    setMotos(motos);
+
+    kmEl.value = '';
+    fechaEl.value = '';
+    obsEl.value = '';
+    pendEl.value = '';
+    document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c => c.checked = false);
+
+    toast('✅ Revisión guardada correctamente');
+    cargar();
+    mostrar('home');
+  }
+
+  btnMoto.onclick=()=>mostrar('moto');
+  btnMantenimiento.onclick=()=>mostrar('mantenimiento');
+  btnHistorial.onclick=()=>mostrar('historial');
+  volverMoto.onclick=()=>mostrar('home');
+  volverMantenimiento.onclick=()=>mostrar('home');
+  volverHistorial.onclick=()=>mostrar('home');
+  $('guardarMoto').onclick = guardarMoto;
+  $('guardarRevision').onclick = guardarRevision;
+
   cargar();
 });
 </script>
 </body>
 </html>
-
