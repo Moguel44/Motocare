@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +20,9 @@ input.error,select.error{border:2px solid #dc2626;box-shadow:0 0 0 2px rgba(220,
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 button.primary{padding:14px;border-radius:22px;border:2px solid transparent;background:linear-gradient(#111827,#020617) padding-box,linear-gradient(135deg,#c9a227,#7c3aed) border-box;color:#fff;font-weight:600}
 button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:8px 14px;border-radius:14px}
-.check-item{display:flex;align-items:center;gap:12px;margin-top:10px}
+.check-item{display:flex;align-items:center;gap:12px;margin-top:10px;justify-content:flex-start}
+.check-item input{margin:0}
+.check-item label{flex:1;text-align:left;white-space:normal}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1f2937,#020617);border:1px solid var(--border);color:#e5e7eb;padding:14px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s}
 .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
 .toast.error{border:1px solid #dc2626}
@@ -38,9 +39,7 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
 <div class="header">
   <img src="Mi_Man.png" class="logo-big" alt="MotoCare" />
   <h1>MotoCare</h1>
-</div>
-
-<div id="home" class="card">
+</div><div id="home" class="card">
   <h2>Motos registradas</h2>
   <ul id="listaMotos" style="list-style:none;padding:0"></ul>
   <div class="menu">
@@ -48,9 +47,7 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
     <button id="btnMantenimiento">Mantenimiento</button>
     <button id="btnHistorial">Historial</button>
   </div>
-</div>
-
-<div id="moto" class="card hidden">
+</div><div id="moto" class="card hidden">
   <h2>Tu moto</h2>
   <input id="marca" placeholder="Marca" />
   <input id="modelo" placeholder="Modelo" />
@@ -63,9 +60,7 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
     <button class="primary" id="guardarMoto">💾 Guardar</button>
     <button class="primary" id="volverMoto">⬅️ Volver</button>
   </div>
-</div>
-
-<div id="mantenimiento" class="card hidden">
+</div><div id="mantenimiento" class="card hidden">
   <h2>Mantenimiento</h2>
   <label>Moto</label>
   <select id="motoSeleccionada">
@@ -75,34 +70,22 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
   <label>Fecha mantenimiento</label>
   <input id="fecha" type="date" />
   <textarea id="obs" placeholder="Observaciones"></textarea>
-  <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>
-
-  <h3>🛢️ Motor y transmisión</h3>
+  <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>  <h3>🛢️ Motor y transmisión</h3>
   <div class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</div>
   <div class="check-item"><input type="checkbox" value="FiltroAceite">Filtro de aceite</div>
   <div class="check-item"><input type="checkbox" value="Bujias">Cambio de bujías</div>
   <div class="check-item"><input type="checkbox" value="Valvulas">Reglaje de válvulas</div>
   <div class="check-item"><input type="checkbox" value="AceiteCaja">Aceite caja de cambios</div>
-  <div class="check-item"><input type="checkbox" value="AceiteEmbrague">Aceite embrague</div>
-
-  <h3>🛑 Frenos</h3>
+  <div class="check-item"><input type="checkbox" value="AceiteEmbrague">Aceite embrague</div>  <h3>🛑 Frenos</h3>
   <div class="check-item"><input type="checkbox" value="PastillasDel">Pastillas delanteras</div>
   <div class="check-item"><input type="checkbox" value="PastillasTras">Pastillas traseras</div>
-  <div class="check-item"><input type="checkbox" value="LiquidoFrenos">Líquido de frenos</div>
-
-  <h3>🌡️ Refrigeración</h3>
-  <div class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</div>
-
-  <h3>🛠️ Suspensión</h3>
-  <div class="check-item"><input type="checkbox" value="Horquilla">Aceite horquillas delanteras</div>
-
-  <div class="actions">
+  <div class="check-item"><input type="checkbox" value="LiquidoFrenos">Líquido de frenos</div>  <h3>🌡️ Refrigeración</h3>
+  <div class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</div>  <h3>🛠️ Suspensión</h3>
+  <div class="check-item"><input type="checkbox" value="Horquilla">Aceite horquillas delanteras</div>  <div class="actions">
     <button class="primary" id="guardarRevision">💾 Guardar</button>
     <button class="primary" id="volverMantenimiento">⬅️ Volver</button>
   </div>
-</div>
-
-<div id="confirmModal" class="modal hidden">
+</div><div id="confirmModal" class="modal hidden">
   <div class="modal-card">
     <h3>Eliminar moto</h3>
     <p id="confirmText"></p>
@@ -111,15 +94,11 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
       <button class="confirm" id="confirmDelete">Eliminar</button>
     </div>
   </div>
-</div>
-
-<div id="historial" class="card hidden">
+</div><div id="historial" class="card hidden">
   <h2>Historial</h2>
   <ul id="listaHistorial" style="list-style:none;padding:0"></ul>
   <button class="primary" id="volverHistorial">⬅️ Volver</button>
-</div>
-
-<script>
+</div><script>
 document.addEventListener('DOMContentLoaded',()=>{
   const $=id=>document.getElementById(id);
   const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
@@ -234,6 +213,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   cargar();
 });
-</script>
-</body>
+</script></body>
 </html>
