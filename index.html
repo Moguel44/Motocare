@@ -20,20 +20,18 @@ input.error,select.error{border:2px solid #dc2626;box-shadow:0 0 0 2px rgba(220,
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 button.primary{padding:14px;border-radius:22px;border:2px solid transparent;background:linear-gradient(#111827,#020617) padding-box,linear-gradient(135deg,#c9a227,#7c3aed) border-box;color:#fff;font-weight:600}
 button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:8px 14px;border-radius:14px}
-.check-item{display:flex;align-items:center;gap:12px;margin-top:10px;justify-content:flex-start}
-.check-item input{margin:0}
-.check-item label{flex:1;text-align:left;white-space:normal}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1f2937,#020617);border:1px solid var(--border);color:#e5e7eb;padding:14px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s}
-.toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)}
-.toast.error{border:1px solid #dc2626}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000}
-.modal.hidden{display:none}
-.modal-card{background:#020617;border-radius:18px;padding:20px;max-width:360px;width:90%;border:1px solid var(--border)}
-.modal-actions{display:flex;gap:12px;margin-top:16px}
-.modal-actions button{flex:1;padding:12px;border-radius:14px;font-weight:600}
-.modal-actions .cancel{background:#111827;color:#e5e7eb;border:1px solid var(--border)}
-.modal-actions .confirm{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none}
-</style>
+.check-item{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:12px;
+  margin:10px 0;
+  text-align:left;
+  cursor:pointer;
+}.check-item input{ margin:0; flex-shrink:0; }
+
+.check-item span{ flex:1; line-height:1.3; } .check-item input{margin:0} .check-item label{flex:1;text-align:left;white-space:normal} .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1f2937,#020617);border:1px solid var(--border);color:#e5e7eb;padding:14px 18px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s} .toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(-6px)} .toast.error{border:1px solid #dc2626} .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000} .modal.hidden{display:none} .modal-card{background:#020617;border-radius:18px;padding:20px;max-width:360px;width:90%;border:1px solid var(--border)} .modal-actions{display:flex;gap:12px;margin-top:16px} .modal-actions button{flex:1;padding:12px;border-radius:14px;font-weight:600} .modal-actions .cancel{background:#111827;color:#e5e7eb;border:1px solid var(--border)} .modal-actions .confirm{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none} </style>
+
 </head>
 <body>
 <div class="header">
@@ -71,17 +69,17 @@ button.danger{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;bord
   <input id="fecha" type="date" />
   <textarea id="obs" placeholder="Observaciones"></textarea>
   <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>  <h3>🛢️ Motor y transmisión</h3>
-  <div class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</div>
-  <div class="check-item"><input type="checkbox" value="FiltroAceite">Filtro de aceite</div>
-  <div class="check-item"><input type="checkbox" value="Bujias">Cambio de bujías</div>
-  <div class="check-item"><input type="checkbox" value="Valvulas">Reglaje de válvulas</div>
-  <div class="check-item"><input type="checkbox" value="AceiteCaja">Aceite caja de cambios</div>
-  <div class="check-item"><input type="checkbox" value="AceiteEmbrague">Aceite embrague</div>  <h3>🛑 Frenos</h3>
-  <div class="check-item"><input type="checkbox" value="PastillasDel">Pastillas delanteras</div>
-  <div class="check-item"><input type="checkbox" value="PastillasTras">Pastillas traseras</div>
-  <div class="check-item"><input type="checkbox" value="LiquidoFrenos">Líquido de frenos</div>  <h3>🌡️ Refrigeración</h3>
-  <div class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</div>  <h3>🛠️ Suspensión</h3>
-  <div class="check-item"><input type="checkbox" value="Horquilla">Aceite horquillas delanteras</div>  <div class="actions">
+<label class="check-item"><input type="checkbox" value="Aceite"><span>Cambio de aceite</span></label>
+<label class="check-item"><input type="checkbox" value="FiltroAceite"><span>Filtro de aceite</span></label>
+<label class="check-item"><input type="checkbox" value="Bujias"><span>Cambio de bujías</span></label>
+<label class="check-item"><input type="checkbox" value="Valvulas"><span>Reglaje de válvulas</span></label>
+<label class="check-item"><input type="checkbox" value="AceiteCaja"><span>Aceite caja de cambios</span></label>
+<label class="check-item"><input type="checkbox" value="AceiteEmbrague"><span>Aceite embrague</span></label><h3>🛑 Frenos</h3>
+<label class="check-item"><input type="checkbox" value="PastillasDel"><span>Pastillas delanteras</span></label>
+<label class="check-item"><input type="checkbox" value="PastillasTras"><span>Pastillas traseras</span></label>
+<label class="check-item"><input type="checkbox" value="LiquidoFrenos"><span>Líquido de frenos</span></label><h3>🌡️ Refrigeración</h3>
+<label class="check-item"><input type="checkbox" value="Anticongelante"><span>Anticongelante</span></label><h3>🛠️ Suspensión</h3>
+<label class="check-item"><input type="checkbox" value="Horquilla"><span>Aceite horquillas delanteras</span></label><div class="actions">
     <button class="primary" id="guardarRevision">💾 Guardar</button>
     <button class="primary" id="volverMantenimiento">⬅️ Volver</button>
   </div>
