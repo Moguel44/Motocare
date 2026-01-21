@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#22d3ee">
 <title>MotoCare</title>
-<link rel="manifest" href="manifest.json">
 
 <style>
 :root{
@@ -61,23 +59,16 @@ button.danger{
   background:#991b1b;
   color:#fff;
   border:none;
-  padding:6px 10px;
+  padding:8px 12px;
   border-radius:12px;
-  cursor:pointer;
 }
-
-/* Checklist */
 .check-item{
   display:grid;
   grid-template-columns:26px 1fr;
+  align-items:center;
   gap:12px;
   margin:10px 0;
-  align-items:center;
 }
-.check-item input{width:20px;height:20px;margin:0}
-.check-item span{text-align:left;line-height:1.4}
-
-/* Toast */
 .toast{
   position:fixed;
   bottom:24px;
@@ -87,11 +78,7 @@ button.danger{
   border:1px solid var(--border);
   padding:14px 18px;
   border-radius:16px;
-  opacity:0;
-  transition:.3s;
 }
-.toast.show{opacity:1}
-.toast.error{border-color:#dc2626}
 </style>
 </head>
 
@@ -102,7 +89,6 @@ button.danger{
   <h1>MotoCare</h1>
 </div>
 
-<!-- HOME -->
 <div id="home" class="card">
   <h2>Motos registradas</h2>
   <ul id="listaMotos" style="list-style:none;padding:0"></ul>
@@ -113,7 +99,6 @@ button.danger{
   <button class="primary" style="margin-top:12px" id="btnHistorial">📜 Historial</button>
 </div>
 
-<!-- MOTO -->
 <div id="moto" class="card hidden">
   <h2>Tu moto</h2>
   <input id="marca" placeholder="Marca">
@@ -129,15 +114,12 @@ button.danger{
   </div>
 </div>
 
-<!-- MANTENIMIENTO -->
 <div id="mantenimiento" class="card hidden">
   <h2>Mantenimiento</h2>
-
   <label>Moto</label>
   <select id="motoSeleccionada"></select>
-
   <input id="km" placeholder="Kilómetros">
-  <label>Fecha mantenimiento</label>
+  <label>Fecha</label>
   <input id="fecha" type="date">
   <textarea id="obs" placeholder="Observaciones"></textarea>
   <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>
@@ -167,133 +149,98 @@ button.danger{
   </div>
 </div>
 
-<!-- HISTORIAL -->
 <div id="historial" class="card hidden">
-  <h2>Historial de mantenimiento</h2>
-  <ul id="listaHistorial" style="list-style:none;padding:0"></ul>
+  <h2>Historial</h2>
+  <ul id="listaHistorial"></ul>
   <button class="primary" id="volverHistorial">⬅️ Volver</button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const $=id=>document.getElementById(id);
-  const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
-  const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
-
-  function show(id){
-    ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
-    $(id).classList.remove('hidden');
-    if(id==='historial') cargarHistorial();
-  }
-
-  function toast(msg,err){
-    const t=document.createElement('div');
-    t.className='toast'+(err?' error':'');
-    t.textContent=msg;
-    document.body.appendChild(t);
-    requestAnimationFrame(()=>t.classList.add('show'));
-    setTimeout(()=>t.remove(),3000);
-  }
-
-  function cargar(){
-    const ul=$('listaMotos'); ul.innerHTML='';
-    const sel=$('motoSeleccionada');
-    sel.innerHTML='<option value="">Selecciona una moto</option>';
-
-    getMotos().forEach(m=>{
-      const li=document.createElement('li');
-      li.style.display='flex';
-      li.style.justifyContent='space-between';
-      li.style.alignItems='center';
-      li.innerHTML=`<span>${m.datos.marca} ${m.datos.modelo||''}</span>`;
-      const b=document.createElement('button');
-      b.className='danger';
-      b.textContent='🗑️';
-      b.onclick=()=>eliminarMoto(m.id);
-      li.appendChild(b);
-      ul.appendChild(li);
-
-      const o=document.createElement('option');
-      o.value=m.id;
-      o.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
-      sel.appendChild(o);
-    });
-  }
-
-  function guardarMoto(){
-    const campos=['marca','modelo','anio','cilindrada','neumaticos','itv'];
-    if(campos.some(c=>!$(c).value)){toast('Rellena todos los campos',true);return;}
-    const motos=getMotos();
-    motos.push({id:'m'+Date.now(),datos:{
-      marca:marca.value,modelo:modelo.value,anio:anio.value,
-      cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
-    },historial:[]});
-    setMotos(motos);
-    campos.forEach(c=>$(c).value='');
-    cargar(); show('home');
-  }
-
-  function guardarRevision(){
-    const sel=$('motoSeleccionada');
-    const kmEl=$('km');
-    const fechaEl=$('fecha');
-    const obsEl=$('obs');
-    const pendEl=$('pendiente');
-
-    if(!sel.value||!kmEl.value||!fechaEl.value){
-      toast('Completa los campos',true);return;
-    }
-
-    const motos=getMotos();
-    const m=motos.find(x=>x.id===sel.value);
-    const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
-
-    m.historial.push({
-      km:kmEl.value,
-      fecha:fechaEl.value,
-      obs:obsEl.value,
-      pendiente:pendEl.value,
-      trabajos
-    });
-
-    setMotos(motos);
-
-    kmEl.value=fechaEl.value=obsEl.value=pendEl.value='';
-    document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c=>c.checked=false);
-
-    toast('Revisión guardada');
-    show('home');
-  }
-
-  function cargarHistorial(){
-    const ul=$('listaHistorial'); ul.innerHTML='';
-    const motos=getMotos();
-    if(!motos.some(m=>m.historial.length)){
-      ul.innerHTML='<li>No hay revisiones registradas</li>';
-      return;
-    }
-    motos.forEach(m=>{
-      m.historial.forEach(r=>{
-        const li=document.createElement('li');
-        li.style.marginBottom='12px';
-        li.innerHTML=`
-          <strong>${m.datos.marca} ${m.datos.modelo||''}</strong><br>
-          📅 ${r.fecha} · 🛣️ ${r.km} km<br>
-          🛠️ ${r.trabajos.join(', ')||'Sin checklist'}
-        `;
-        ul.appendChild(li);
-      });
-    });
-  }
-
-  $('btnMoto').onclick=()=>show('moto');
-  $('btnMantenimiento').onclick=()=>show('mantenimiento');
-  $('btnHistorial').onclick=()=>show('historial');
-  $('volverMoto').onclick=$('volverMantenimiento').onclick=$('volverHistorial').onclick=()=>show('home');
-  $('guardarMoto').onclick=guardarMoto;
-  $('guardarRevision').onclick=guardarRevision;
-
+function eliminarMoto(id){
+  const motos=JSON.parse(localStorage.getItem('motos')||'[]');
+  const moto=motos.find(m=>m.id===id);
+  if(!moto) return;
+  if(!confirm(`¿Eliminar ${moto.datos.marca} ${moto.datos.modelo||''} y todo su historial?`)) return;
+  localStorage.setItem('motos',JSON.stringify(motos.filter(m=>m.id!==id)));
   cargar();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+const $=id=>document.getElementById(id);
+const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
+const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
+
+function show(id){
+['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
+$(id).classList.remove('hidden');
+if(id==='historial') cargarHistorial();
+}
+
+window.cargar=function(){
+$('listaMotos').innerHTML='';
+$('motoSeleccionada').innerHTML='<option value="">Selecciona una moto</option>';
+getMotos().forEach(m=>{
+  const li=document.createElement('li');
+  li.style.display='flex';
+  li.style.justifyContent='space-between';
+  li.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
+  const b=document.createElement('button');
+  b.className='danger';
+  b.textContent='🗑️';
+  b.onclick=()=>eliminarMoto(m.id);
+  li.appendChild(b);
+  $('listaMotos').appendChild(li);
+  const o=document.createElement('option');
+  o.value=m.id;
+  o.textContent=li.textContent;
+  $('motoSeleccionada').appendChild(o);
+});
+}
+
+function guardarMoto(){
+const campos=['marca','modelo','anio','cilindrada','neumaticos','itv'];
+if(campos.some(c=>!$(c).value)){alert('Rellena todos los campos');return;}
+const motos=getMotos();
+motos.push({id:'m'+Date.now(),datos:{
+marca:marca.value,modelo:modelo.value,anio:anio.value,
+cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
+},historial:[]});
+setMotos(motos);
+campos.forEach(c=>$(c).value='');
+cargar(); show('home');
+}
+
+function guardarRevision(){
+if(!motoSeleccionada.value||!km.value||!fecha.value){alert('Completa los campos');return;}
+const motos=getMotos();
+const m=motos.find(x=>x.id===motoSeleccionada.value);
+const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
+m.historial.push({km:km.value,fecha:fecha.value,obs:obs.value,pendiente:pendiente.value,trabajos});
+setMotos(motos);
+km.value=fecha.value=obs.value=pendiente.value='';
+document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c=>c.checked=false);
+show('home');
+}
+
+function cargarHistorial(){
+$('listaHistorial').innerHTML='';
+getMotos().forEach(m=>{
+m.historial.forEach(r=>{
+const li=document.createElement('li');
+li.innerHTML=`<strong>${m.datos.marca}</strong> – ${r.fecha} (${r.km} km)<br>${r.trabajos.join(', ')}`;
+$('listaHistorial').appendChild(li);
+});
+});
+}
+
+btnMoto.onclick=()=>show('moto');
+btnMantenimiento.onclick=()=>show('mantenimiento');
+btnHistorial.onclick=()=>show('historial');
+volverMoto.onclick=volverMantenimiento.onclick=volverHistorial.onclick=()=>show('home');
+guardarMoto.onclick=guardarMoto;
+guardarRevision.onclick=guardarRevision;
+
+cargar();
 });
 </script>
 </body>
