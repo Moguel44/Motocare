@@ -337,13 +337,16 @@ historialMoto.onchange=()=>{
   });
 };
 
-btnMoto.onclick=()=>show('moto');
-btnMantenimiento.onclick=()=>show('mantenimiento');
-btnHistorial.onclick=()=>show('historial');
-volverMoto.onclick=volverMantenimiento.onclick=volverHistorial.onclick=()=>show('home');
-guardarMoto.onclick=guardarMoto;
-guardarRevision.onclick=guardarRevision;
+$('btnMoto').onclick = () => show('moto');
+$('btnMantenimiento').onclick = () => show('mantenimiento');
+$('btnHistorial').onclick = () => show('historial');
 
+$('volverMoto').onclick =
+$('volverMantenimiento').onclick =
+$('volverHistorial').onclick = () => show('home');
+
+$('guardarMoto').onclick = guardarMoto;
+$('guardarRevision').onclick = guardarRevision;
 cargar();
 });
 </script>
