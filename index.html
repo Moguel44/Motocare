@@ -61,6 +61,7 @@ button.primary{
     linear-gradient(135deg,#c9a227,#7c3aed) border-box;
   color:#fff;
   font-weight:600;
+  cursor:pointer;
 }
 
 button.danger{
@@ -69,6 +70,7 @@ button.danger{
   border:none;
   padding:6px 10px;
   border-radius:12px;
+  cursor:pointer;
 }
 
 .check-item{
@@ -167,7 +169,6 @@ button.danger{
 <!-- MANTENIMIENTO -->
 <div id="mantenimiento" class="card hidden">
   <h2>Mantenimiento</h2>
-
   <label>Moto</label>
   <select id="motoSeleccionada"></select>
 
@@ -179,22 +180,8 @@ button.danger{
 
   <h3>🛢️ Motor y transmisión</h3>
   <label class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</label>
-  <label class="check-item"><input type="checkbox" value="FiltroAceite">Filtro de aceite</label>
-  <label class="check-item"><input type="checkbox" value="Bujias">Bujías</label>
-  <label class="check-item"><input type="checkbox" value="Valvulas">Reglaje de válvulas</label>
-  <label class="check-item"><input type="checkbox" value="AceiteCaja">Aceite caja cambios</label>
-  <label class="check-item"><input type="checkbox" value="AceiteEmbrague">Aceite embrague</label>
-
-  <h3>🛑 Frenos</h3>
-  <label class="check-item"><input type="checkbox" value="PastillasDel">Pastillas delanteras</label>
-  <label class="check-item"><input type="checkbox" value="PastillasTras">Pastillas traseras</label>
-  <label class="check-item"><input type="checkbox" value="LiquidoFrenos">Líquido de frenos</label>
-
-  <h3>🌡️ Refrigeración</h3>
-  <label class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</label>
-
-  <h3>🛠️ Suspensión</h3>
-  <label class="check-item"><input type="checkbox" value="Horquilla">Aceite horquillas delanteras</label>
+  <label class="check-item"><input type="checkbox" value="Filtro aceite">Filtro de aceite</label>
+  <label class="check-item"><input type="checkbox" value="Bujías">Bujías</label>
 
   <div class="actions">
     <button class="primary" id="guardarRevision">💾 Guardar</button>
@@ -208,7 +195,10 @@ button.danger{
   <label>Selecciona moto</label>
   <select id="historialMoto"></select>
   <ul id="listaHistorial"></ul>
-  <button class="primary" id="volverHistorial"<button class="primary" id="btnPDF">📄 Exportar PDF</button>>⬅️ Volver</button>
+  <div class="actions">
+    <button class="primary" id="btnPDF">📄 Exportar PDF</button>
+    <button class="primary" id="volverHistorial">⬅️ Volver</button>
+  </div>
 </div>
 
 <!-- MODAL -->
@@ -244,24 +234,26 @@ function show(id){
 }
 
 function cargar(){
-  listaMotos.innerHTML='';
-  motoSeleccionada.innerHTML='<option value="">Selecciona una moto</option>';
+  $('listaMotos').innerHTML='';
+  $('motoSeleccionada').innerHTML='<option value="">Selecciona una moto</option>';
   getMotos().forEach(m=>{
     const li=document.createElement('li');
     li.style.display='flex';
     li.style.justifyContent='space-between';
     li.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
+
     const b=document.createElement('button');
     b.className='danger';
     b.textContent='🗑️';
     b.onclick=()=>confirmarEliminar(m.id);
+
     li.appendChild(b);
-    listaMotos.appendChild(li);
+    $('listaMotos').appendChild(li);
 
     const o=document.createElement('option');
     o.value=m.id;
     o.textContent=li.textContent;
-    motoSeleccionada.appendChild(o);
+    $('motoSeleccionada').appendChild(o);
   });
 }
 
@@ -291,11 +283,14 @@ function confirmarEliminar(id){
   confirmText.textContent=`¿Eliminar ${m.datos.marca} ${m.datos.modelo||''} y su historial?`;
   confirmModal.classList.remove('hidden');
 }
+
 confirmDelete.onclick=()=>{
   setMotos(getMotos().filter(m=>m.id!==borrarId));
   confirmModal.classList.add('hidden');
   cargar();
+  cargarSelectorHistorial();
 };
+
 cancelDelete.onclick=()=>confirmModal.classList.add('hidden');
 
 function guardarRevision(){
@@ -305,9 +300,9 @@ function guardarRevision(){
   const motos=getMotos();
   const m=motos.find(x=>x.id===motoSeleccionada.value);
   const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
-  m.historial.push({km:km.value,fecha:fecha.value,obs:obs.value,pendiente:pendiente.value,trabajos});
+  m.historial.push({km:km.value,fecha:fecha.value,trabajos});
   setMotos(motos);
-  km.value=fecha.value=obs.value=pendiente.value='';
+  km.value=fecha.value='';
   document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c=>c.checked=false);
   toast('Revisión guardada');
   show('home');
@@ -337,16 +332,21 @@ historialMoto.onchange=()=>{
   });
 };
 
-$('btnMoto').onclick = () => show('moto');
-$('btnMantenimiento').onclick = () => show('mantenimiento');
-$('btnHistorial').onclick = () => show('historial');
+btnPDF.onclick=()=>{
+  window.print();
+};
 
-$('volverMoto').onclick =
-$('volverMantenimiento').onclick =
-$('volverHistorial').onclick = () => show('home');
+btnMoto.onclick=()=>show('moto');
+btnMantenimiento.onclick=()=>show('mantenimiento');
+btnHistorial.onclick=()=>show('historial');
 
-$('guardarMoto').onclick = guardarMoto;
-$('guardarRevision').onclick = guardarRevision;
+volverMoto.onclick=
+volverMantenimiento.onclick=
+volverHistorial.onclick=()=>show('home');
+
+guardarMoto.onclick=guardarMoto;
+guardarRevision.onclick=guardarRevision;
+
 cargar();
 });
 </script>
