@@ -302,40 +302,67 @@ saveEdit.onclick=()=>{
 cancelEdit.onclick=()=>editModal.classList.add('hidden');
 
 /* PDF CON LOGO */
-btnPDF.onclick=()=>{
- const m=getMotos().find(x=>x.id===historialMoto.value);
- if(!m||m.historial.length===0){
-  toast('Nada que exportar',true); return;
- }
+btnPDF.onclick = () => {
+  const m = getMotos().find(x => x.id === historialMoto.value);
 
- const doc=new jsPDF();
- let y=20;
+  if (!m || m.historial.length === 0) {
+    toast('Nada que exportar', true);
+    return;
+  }
 
- const img=new Image();
- img.src='Mi_Man.png';
+  const doc = new jsPDF();
+  let y = 20;
 
- img.onload=()=>{
-  doc.addImage(img,'PNG',60,y,90,90);
-  y+=105;
+  const img = new Image();
+  img.src = 'Mi_Man.png';
 
-  doc.setFontSize(18);
-  doc.text('MotoCare – Historial de mantenimiento',105,y,{align:'center'});
-  y+=15;
+  img.onload = () => {
 
-  doc.setFontSize(11);
-  doc.text(`Moto: ${m.datos.marca} ${m.datos.modelo||''}`,14,y); y+=6;
-  doc.text(`Año: ${m.datos.anio} | Cilindrada: ${m.datos.cilindrada}`,14,y); y+=6;
-  doc.text(`ITV: ${m.datos.itv}`,14,y); y+=10;
+    /* LOGO */
+    doc.addImage(img, 'PNG', 60, y, 90, 90);
+    y += 105;
 
-  m.historial.forEach((r,i)=>{
-    if(y>270){doc.addPage();y=20;}
-    doc.text(`${i+1}. ${r.fecha} – ${r.km} km`,14,y); y+=6;
-    doc.setFontSize(10);
-    doc.text(r.trabajos.join(', '),18,y); y+=8;
-    doc.setFontSize(11);
-  });
+    /* TITULO */
+    doc.setFontSize(20);
+    doc.text('MotoCare', 105, y, { align: 'center' });
+    y += 8;
 
-  doc.save(`MotoCare_${m.datos.marca}.pdf`);
+    doc.setFontSize(14);
+    doc.text('Historial de mantenimiento', 105, y, { align: 'center' });
+    y += 15;
+
+    /* FICHA DE LA MOTO (CLAVE) */
+    doc.setFontSize(12);
+    doc.text(`Marca: ${m.datos.marca}`, 14, y); y += 6;
+    doc.text(`Modelo: ${m.datos.modelo || '-'}`, 14, y); y += 6;
+    doc.text(`Año: ${m.datos.anio}`, 14, y); y += 6;
+    doc.text(`Cilindrada: ${m.datos.cilindrada}`, 14, y); y += 6;
+    doc.text(`ITV: ${m.datos.itv}`, 14, y); y += 10;
+
+    /* HISTORIAL */
+    m.historial.forEach((r, i) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.setFontSize(12);
+      doc.text(`${i + 1}. ${r.fecha} – ${r.km} km`, 14, y);
+      y += 6;
+
+      doc.setFontSize(10);
+      doc.text(r.trabajos.join(', '), 18, y);
+      y += 8;
+    });
+
+    doc.save(`MotoCare_${m.datos.marca}_${m.datos.modelo || ''}.pdf`);
+  };
+
+  img.onerror = () => {
+    toast('No se pudo cargar el logo', true);
+  };
+};
+
  };
 };
 
