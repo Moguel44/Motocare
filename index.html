@@ -1,249 +1,408 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<link rel="manifest" href="manifest.json">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MotoCare</title>
-
-<style>
-:root{
-  --bg:#0b1220;
-  --card:#020617;
-  --accent:#7dd3fc;
-  --border:#1e293b;
-}
-body{
-  margin:0;
-  padding:16px;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
-  background:var(--bg);
-  color:#e5e7eb;
-}
-.header{text-align:center;margin-bottom:20px}
-.logo-big{width:110px;height:110px;border-radius:22px}
-h1{color:var(--accent);margin:10px 0}
-.card{
-  max-width:720px;
-  margin:0 auto 20px;
-  padding:20px;
-  background:rgba(2,6,23,.95);
-  border-radius:18px;
-}
-.hidden{display:none}
-input,textarea,select{
-  width:100%;
-  margin-top:12px;
-  padding:14px;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  color:#e5e7eb;
-}
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:18px;
-}
-button.primary{
-  padding:14px;
-  border-radius:22px;
-  border:2px solid transparent;
-  background:
-    linear-gradient(#020617,#020617) padding-box,
-    linear-gradient(135deg,#c9a227,#7c3aed) border-box;
-  color:#fff;
-  font-weight:600;
-}
-button.danger{
-  background:#991b1b;
-  color:#fff;
-  border:none;
-  padding:6px 10px;
-  border-radius:12px;
-}
-.check-item{
-  display:grid;
-  grid-template-columns:26px 1fr;
-  align-items:center;
-  gap:12px;
-  margin:10px 0;
-}
-.check-item input{width:20px;height:20px}
-.toast{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#020617;
-  border:1px solid var(--border);
-  padding:14px 18px;
-  border-radius:16px;
-  opacity:0;
-  transition:.3s;
-}
-.toast.show{opacity:1}
-.toast.error{border-color:#dc2626}
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.modal.hidden{display:none}
-.modal-card{
-  background:#020617;
-  padding:20px;
-  border-radius:18px;
-  max-width:360px;
-  width:90%;
-}
-.modal-actions{
-  display:flex;
-  gap:12px;
-  margin-top:16px;
-}
-.modal-actions .confirm{
-  background:#991b1b;
-  color:#fff;
-  border:none;
-}
-</style>
-</head>
-
-<body>
-
-<div class="header">
-  <img src="Mi_Man.png" alt="MotoCare" class="logo-big">
-  <h1>MotoCare</h1>
-</div>
-
-<!-- HOME -->
-<div id="home" class="card">
-  <h2>Motos registradas</h2>
-  <ul id="listaMotos"></ul>
-
-  <div class="actions">
-    <button class="primary" id="btnMoto">➕ Moto</button>
-    <button class="primary" id="btnMantenimiento">🛠️ Mantenimiento</button>
-  </div>
-
-  <div class="actions">
-    <button class="primary" id="btnBackup">💾 Exportar backup</button>
-    <button class="primary" id="btnRestore">📂 Importar backup</button>
-  </div>
-
-  <button class="primary" id="btnHistorial">📜 Historial</button>
-</div>
-
-<input type="file" id="fileRestore" accept=".json" class="hidden">
-
-<!-- MOTO -->
-<div id="moto" class="card hidden">
-  <input id="marca" placeholder="Marca">
-  <input id="modelo" placeholder="Modelo">
-  <input id="anio" placeholder="Año">
-  <input id="cilindrada" placeholder="Cilindrada">
-  <input id="neumaticos" placeholder="Neumáticos">
-  <label>Fecha ITV</label>
-  <input id="itv" type="date">
-  <div class="actions">
-    <button class="primary" id="guardarMoto">Guardar</button>
-    <button class="primary" id="volverMoto">Volver</button>
-  </div>
-</div>
-
-<!-- MANTENIMIENTO -->
-<div id="mantenimiento" class="card hidden">
-  <select id="motoSeleccionada"></select>
-  <input id="km" placeholder="Kilómetros">
-  <input id="fecha" type="date">
-
-  <h3>🛢️ Motor y transmisión</h3>
-  <label class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</label>
-  <label class="check-item"><input type="checkbox" value="Filtro aceite">Filtro de aceite</label>
-  <label class="check-item"><input type="checkbox" value="Bujías">Bujías</label>
-  <label class="check-item"><input type="checkbox" value="Válvulas">Reglaje de válvulas</label>
-  <label class="check-item"><input type="checkbox" value="Aceite caja">Aceite caja cambios</label>
-
-  <h3>🛑 Frenos</h3>
-  <label class="check-item"><input type="checkbox" value="Pastillas del.">Pastillas delanteras</label>
-  <label class="check-item"><input type="checkbox" value="Pastillas tras.">Pastillas traseras</label>
-  <label class="check-item"><input type="checkbox" value="Líquido frenos">Líquido de frenos</label>
-
-  <h3>🌡️ Refrigeración</h3>
-  <label class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</label>
-
-  <h3>🛠️ Suspensión</h3>
-  <label class="check-item"><input type="checkbox" value="Horquilla">Aceite horquilla</label>
-
-  <div class="actions">
-    <button class="primary" id="guardarRevision">Guardar</button>
-    <button class="primary" id="volverMantenimiento">Volver</button>
-  </div>
-</div>
-
-<!-- HISTORIAL -->
-<div id="historial" class="card hidden">
-  <select id="historialMoto"></select>
-  <ul id="listaHistorial"></ul>
-  <div class="actions">
-    <button class="primary" id="btnPDF">📄 PDF</button>
-    <button class="primary" id="volverHistorial">Volver</button>
-  </div>
-</div>
-
-<!-- MODAL EDITAR -->
-<div id="editModal" class="modal hidden">
-  <div class="modal-card">
-    <input type="date" id="editFecha">
-    <input id="editKm">
-    <textarea id="editTrabajos"></textarea>
-    <div class="modal-actions">
-      <button id="cancelEdit">Cancelar</button>
-      <button class="confirm" id="saveEdit">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-const $=id=>document.getElementById(id);
-const { jsPDF } = window.jspdf;
-
-const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
+<!DOCTYPE html>  <html lang="es">    <head>    
+<link rel="manifest" href="manifest.json">    
+  <meta charset="UTF-8">    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">    
+<title>MotoCare</title>  <style>    
+:root{    
+  --bg:#0b1220;    
+  --card:#020617;    
+  --accent:#7dd3fc;    
+  --border:#1e293b;    
+}    
+body{    
+  margin:0;    
+  padding:16px;    
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;    
+  background:var(--bg);    
+  color:#e5e7eb;    
+}    
+.header{text-align:center;margin-bottom:20px}    
+.logo-big{width:110px;height:110px;border-radius:22px}    
+h1{color:var(--accent);margin:10px 0}    
+.card{    
+  max-width:720px;    
+  margin:0 auto 20px;    
+  padding:20px;    
+  background:rgba(2,6,23,.95);    
+  border-radius:18px;    
+}    
+.hidden{display:none}    
+input,textarea,select{    
+  width:100%;    
+  margin-top:12px;    
+  padding:14px;    
+  background:var(--card);    
+  border:1px solid var(--border);    
+  border-radius:12px;    
+  color:#e5e7eb;    
+}    
+.actions{    
+  display:grid;    
+  grid-template-columns:1fr 1fr;    
+  gap:12px;    
+  margin-top:18px;    
+}    
+button.primary{    
+  padding:14px;    
+  border-radius:22px;    
+  border:2px solid transparent;    
+  background:    
+    linear-gradient(#020617,#020617) padding-box,    
+    linear-gradient(135deg,#c9a227,#7c3aed) border-box;    
+  color:#fff;    
+  font-weight:600;    
+}    
+button.danger{    
+  background:#991b1b;    
+  color:#fff;    
+  border:none;    
+  padding:6px 10px;    
+  border-radius:12px;    
+}    
+.check-item{    
+  display:grid;    
+  grid-template-columns:26px 1fr;    
+  align-items:center;    
+  gap:12px;    
+  margin:10px 0;    
+}    
+.check-item input{width:20px;height:20px}    
+.toast{    
+  position:fixed;    
+  bottom:24px;    
+  left:50%;    
+  transform:translateX(-50%);    
+  background:#020617;    
+  border:1px solid var(--border);    
+  padding:14px 18px;    
+  border-radius:16px;    
+  opacity:0;    
+  transition:.3s;    
+}    
+.toast.show{opacity:1}    
+.toast.error{border-color:#dc2626}    
+.modal{    
+  position:fixed;    
+  inset:0;    
+  background:rgba(0,0,0,.6);    
+  display:flex;    
+  align-items:center;    
+  justify-content:center;    
+}    
+.modal.hidden{display:none}    
+.modal-card{    
+  background:#020617;    
+  padding:20px;    
+  border-radius:18px;    
+  max-width:360px;    
+  width:90%;    
+}    
+.modal-actions{    
+  display:flex;    
+  gap:12px;    
+  margin-top:16px;    
+}    
+.modal-actions .confirm{    
+  background:#991b1b;    
+  color:#fff;    
+  border:none;    
+}    
+</style>  </head>  <body>  <div class="header">    
+  <img src="Mi_Man.png" alt="MotoCare" class="logo-big">    
+  <h1>MotoCare</h1>    
+</div>  <!-- HOME -->  <div id="home" class="card">    
+  <h2>Motos registradas</h2>    
+  <ul id="listaMotos"></ul>    <div class="actions">    
+    <button class="primary" id="btnMoto">➕ Moto</button>    
+    <button class="primary" id="btnMantenimiento">🛠️ Mantenimiento</button>    
+  </div>    <div class="actions">    
+    <button class="primary" id="btnBackup">💾 Exportar backup</button>    
+    <button class="primary" id="btnRestore">📂 Importar backup</button>    
+  </div>  <button class="primary" id="btnHistorial">📜 Historial</button>  </div>  <input type="file" id="fileRestore" accept=".json" class="hidden">  <!-- MOTO -->  <div id="moto" class="card hidden">    
+  <input id="marca" placeholder="Marca">    
+  <input id="modelo" placeholder="Modelo">    
+  <input id="anio" placeholder="Año">    
+  <input id="cilindrada" placeholder="Cilindrada">    
+  <input id="neumaticos" placeholder="Neumáticos">    
+  <label>Fecha ITV</label>    
+  <input id="itv" type="date">    
+  <div class="actions">    
+    <button class="primary" id="guardarMoto">Guardar</button>    
+    <button class="primary" id="volverMoto">Volver</button>    
+  </div>    
+</div>  <!-- MANTENIMIENTO -->  <div id="mantenimiento" class="card hidden">    
+  <select id="motoSeleccionada"></select>    
+  <input id="km" placeholder="Kilómetros">    
+  <input id="fecha" type="date">    <h3>🛢️ Motor y transmisión</h3>    
+  <label class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</label>    
+  <label class="check-item"><input type="checkbox" value="Filtro aceite">Filtro de aceite</label>    
+  <label class="check-item"><input type="checkbox" value="Bujías">Bujías</label>    
+  <label class="check-item"><input type="checkbox" value="Válvulas">Reglaje de válvulas</label>    
+  <label class="check-item"><input type="checkbox" value="Aceite caja">Aceite caja cambios</label>    <h3>🛑 Frenos</h3>    
+  <label class="check-item"><input type="checkbox" value="Pastillas del.">Pastillas delanteras</label>    
+  <label class="check-item"><input type="checkbox" value="Pastillas tras.">Pastillas traseras</label>    
+  <label class="check-item"><input type="checkbox" value="Líquido frenos">Líquido de frenos</label>    <h3>🌡️ Refrigeración</h3>    
+  <label class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</label>    <h3>🛠️ Suspensión</h3>    
+  <label class="check-item"><input type="checkbox" value="Horquilla">Aceite horquilla</label>    <div class="actions">    
+    <button class="primary" id="guardarRevision">Guardar</button>    
+    <button class="primary" id="volverMantenimiento">Volver</button>    
+  </div>    
+</div>  <!-- HISTORIAL -->  <div id="historial" class="card hidden">    
+  <select id="historialMoto"></select>    
+  <ul id="listaHistorial"></ul>    
+  <div class="actions">    
+    <button class="primary" id="btnPDF">📄 PDF</button>    
+    <button class="primary" id="volverHistorial">Volver</button>    
+  </div>    
+</div>  <!-- MODAL EDITAR -->  <div id="editModal" class="modal hidden">    
+  <div class="modal-card">    
+    <input type="date" id="editFecha">    
+    <input id="editKm">    
+    <textarea id="editTrabajos"></textarea>    
+    <div class="modal-actions">    
+      <button id="cancelEdit">Cancelar</button>    
+      <button class="confirm" id="saveEdit">Guardar</button>    
+    </div>    
+  </div>    
+</div>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script>    
+document.addEventListener('DOMContentLoaded',()=>{    
+const $=id=>document.getElementById(id);    
+const { jsPDF } = window.jspdf;    const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
 const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
 
 let editMotoId=null, editRevisionIndex=null;
 
-/* ===== AÑADIDO ===== */
-let borrarId = null;
-// # MotoCare — ELIMINA MOTO Y TODO SU HISTORIAL
-function eliminarMotoConfirmada(){
-  setMotos(getMotos().filter(m => m.id !== borrarId));
-  cargar();
-}
-/* ===== FIN AÑADIDO ===== */
-
 function toast(msg,err){
-  const t=document.createElement('div');
-  t.className='toast'+(err?' error':'');
-  t.textContent=msg;
-  document.body.appendChild(t);
-  requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>t.remove(),3000);
+const t=document.createElement('div');
+t.className='toast'+(err?' error':'');
+t.textContent=msg;
+document.body.appendChild(t);
+requestAnimationFrame(()=>t.classList.add('show'));
+setTimeout(()=>t.remove(),3000);
+}
+function solicitarNotificaciones(){
+if(!('Notification' in window)) return;
+
+if(Notification.permission === 'default'){
+Notification.requestPermission().then(p=>{
+if(p === 'granted'){
+toast('Notificaciones activadas');
+}
+});
+}
 }
 
-/* … EL RESTO DE TU JS SIGUE EXACTAMENTE IGUAL … */
+function enviarNotificacion(texto){
+if(!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+
+navigator.serviceWorker.controller.postMessage({
+type: 'ITV_ALERT',
+text: texto
+});
+}
+
+function show(id){
+['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
+$(id).classList.remove('hidden');
+if(id==='historial') cargarHistorialSelector();
+}
+
+function cargar(){
+listaMotos.innerHTML='';
+motoSeleccionada.innerHTML='<option value="">Moto</option>';
+getMotos().forEach(m=>{
+const li=document.createElement('li');
+li.textContent=m.datos.marca+' '+(m.datos.modelo||'');
+listaMotos.appendChild(li);
+const o=document.createElement('option');
+o.value=m.id; o.textContent=li.textContent;
+motoSeleccionada.appendChild(o);
+});
+}
+
+function cargarHistorialSelector(){
+historialMoto.innerHTML='<option value="">Moto</option>';
+getMotos().forEach(m=>{
+const o=document.createElement('option');
+o.value=m.id; o.textContent=m.datos.marca;
+historialMoto.appendChild(o);
+});
+listaHistorial.innerHTML='';
+}
+
+historialMoto.onchange=()=>{
+listaHistorial.innerHTML='';
+const motoId=historialMoto.value;
+const m=getMotos().find(x=>x.id===motoId);
+if(!m||m.historial.length===0){
+listaHistorial.innerHTML='<li>No hay revisiones</li>'; return;
+}
+m.historial.forEach((r,i)=>{
+const li=document.createElement('li');
+li.innerHTML=${r.fecha} – ${r.km} km<br>${r.trabajos.join(', ')}     <br><button class="primary">✏️ Editar</button>;
+li.querySelector('button').onclick=()=>abrirEditor(motoId,i);
+listaHistorial.appendChild(li);
+});
+};
+
+function abrirEditor(motoId,i){
+const m=getMotos().find(x=>x.id===motoId);
+const r=m.historial[i];
+editMotoId=motoId;
+editRevisionIndex=i;
+editFecha.value=r.fecha;
+editKm.value=r.km;
+editTrabajos.value=r.trabajos.join(', ');
+editModal.classList.remove('hidden');
+}
+
+saveEdit.onclick=()=>{
+const motos=getMotos();
+const m=motos.find(x=>x.id===editMotoId);
+m.historial[editRevisionIndex]={
+fecha:editFecha.value,
+km:editKm.value,
+trabajos:editTrabajos.value.split(',').map(t=>t.trim())
+};
+setMotos(motos);
+editModal.classList.add('hidden');
+historialMoto.onchange();
+toast('Revisión actualizada');
+};
+
+cancelEdit.onclick=()=>editModal.classList.add('hidden');
+
+/* PDF CON LOGO */
+btnPDF.onclick = () => {
+const m = getMotos().find(x => x.id === historialMoto.value);
+
+if (!m || m.historial.length === 0) {
+toast('Nada que exportar', true);
+return;
+}
+
+const doc = new jsPDF();
+let y = 20;
+
+const img = new Image();
+img.src = 'Mi_Man.png';
+
+img.onload = () => {
+
+/* LOGO */    
+doc.addImage(img, 'PNG', 60, y, 90, 90);    
+y += 105;    
+
+/* TITULO */    
+doc.setFontSize(20);    
+doc.text('MotoCare', 105, y, { align: 'center' });    
+y += 8;    
+
+doc.setFontSize(14);    
+doc.text('Historial de mantenimiento', 105, y, { align: 'center' });    
+y += 15;    
+
+/* FICHA DE LA MOTO (CLAVE) */    
+doc.setFontSize(12);    
+doc.text(`Marca: ${m.datos.marca}`, 14, y); y += 6;    
+doc.text(`Modelo: ${m.datos.modelo || '-'}`, 14, y); y += 6;    
+doc.text(`Año: ${m.datos.anio}`, 14, y); y += 6;    
+doc.text(`Cilindrada: ${m.datos.cilindrada}`, 14, y); y += 6;    
+doc.text(`ITV: ${m.datos.itv}`, 14, y); y += 10;    
+
+/* HISTORIAL */    
+m.historial.forEach((r, i) => {    
+  if (y > 270) {    
+    doc.addPage();    
+    y = 20;    
+  }    
+
+  doc.setFontSize(12);    
+  doc.text(`${i + 1}. ${r.fecha} – ${r.km} km`, 14, y);    
+  y += 6;    
+
+  doc.setFontSize(10);    
+  doc.text(r.trabajos.join(', '), 18, y);    
+  y += 8;    
+});    
+
+doc.save(`MotoCare_${m.datos.marca}_${m.datos.modelo || ''}.pdf`);
+
+};
+
+img.onerror = () => {
+toast('No se pudo cargar el logo', true);
+};
+};
+
+/* BACKUP */
+btnBackup.onclick=()=>{
+const data=getMotos();
+if(data.length===0){toast('No hay datos',true);return;}
+const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='MotoCare_backup.json';
+a.click();
+toast('Backup exportado');
+};
+
+btnRestore.onclick=()=>fileRestore.click();
+
+fileRestore.onchange=e=>{
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=()=>{
+try{
+const data=JSON.parse(reader.result);
+if(!Array.isArray(data)) throw 'Error';
+setMotos(data);
+cargar();
+toast('Backup restaurado');
+}catch{
+toast('Archivo no válido',true);
+}
+};
+reader.readAsText(file);
+};
+
+btnMoto.onclick=()=>show('moto');
+btnMantenimiento.onclick=()=>show('mantenimiento');
+btnHistorial.onclick=()=>show('historial');
+volverMoto.onclick=
+volverMantenimiento.onclick=
+volverHistorial.onclick=()=>show('home');
+
+guardarMoto.onclick=()=>{
+if(!marca.value||!anio.value||!cilindrada.value||!itv.value){
+toast('Rellena todos los campos',true); return;
+}
+const motos=getMotos();
+motos.push({id:'m'+Date.now(),datos:{
+marca:marca.value,modelo:modelo.value,anio:anio.value,
+cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
+},historial:[]});
+setMotos(motos);
+cargar(); show('home');
+};
+
+guardarRevision.onclick=()=>{
+if(!motoSeleccionada.value||!km.value||!fecha.value){
+toast('Completa los campos',true); return;
+}
+const motos=getMotos();
+const m=motos.find(x=>x.id===motoSeleccionada.value);
+const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
+m.historial.push({fecha:fecha.value,km:km.value,trabajos});
+setMotos(motos);
+toast('Revisión guardada');
+show('home');
+};
 
 cargar();
 solicitarNotificaciones();
 });
-</script>
-</body>
+</script>  </body>
+
 </html>
