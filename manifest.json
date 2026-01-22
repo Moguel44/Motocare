@@ -1,11 +1,13 @@
 {
+  "id": "/motocare",
   "name": "MotoCare",
   "short_name": "MotoCare",
-  "start_url": "./",
+  "description": "Gestión de mantenimiento, revisiones e ITV para motos",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#22d3ee",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
   "icons": [
     {
       "src": "icon-192.png",
@@ -19,3 +21,4 @@
     }
   ]
 }
+
