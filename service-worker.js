@@ -4,16 +4,17 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
-        './',
-        './index.html',
-        './manifest.json',
-        './Mi_Man.png',
-        './icon-192.png',
-        './icon-512.png'
+        '/MotoCare/',
+        '/MotoCare/index.html',
+        '/MotoCare/manifest.json',
+        '/MotoCare/Mi_Man.png',
+        '/MotoCare/icon-192.png',
+        '/MotoCare/icon-512.png'
       ])
     )
   );
   self.skipWaiting();
+});
 });
 
 self.addEventListener('activate', event => {
