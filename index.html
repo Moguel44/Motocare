@@ -54,7 +54,6 @@ button.primary{
     linear-gradient(135deg,#c9a227,#7c3aed) border-box;
   color:#fff;
   font-weight:600;
-  cursor:pointer;
 }
 button.danger{
   background:#991b1b;
@@ -63,6 +62,28 @@ button.danger{
   padding:6px 10px;
   border-radius:12px;
 }
+.check-item{
+  display:grid;
+  grid-template-columns:26px 1fr;
+  align-items:center;
+  gap:12px;
+  margin:10px 0;
+}
+.check-item input{width:20px;height:20px}
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#020617;
+  border:1px solid var(--border);
+  padding:14px 18px;
+  border-radius:16px;
+  opacity:0;
+  transition:.3s;
+}
+.toast.show{opacity:1}
+.toast.error{border-color:#dc2626}
 .modal{
   position:fixed;
   inset:0;
@@ -98,6 +119,7 @@ button.danger{
   <h1>MotoCare</h1>
 </div>
 
+<!-- HOME -->
 <div id="home" class="card">
   <h2>Motos registradas</h2>
   <ul id="listaMotos"></ul>
@@ -108,12 +130,14 @@ button.danger{
   <button class="primary" id="btnHistorial">📜 Historial</button>
 </div>
 
+<!-- MOTO -->
 <div id="moto" class="card hidden">
   <input id="marca" placeholder="Marca">
   <input id="modelo" placeholder="Modelo">
   <input id="anio" placeholder="Año">
   <input id="cilindrada" placeholder="Cilindrada">
   <input id="neumaticos" placeholder="Neumáticos">
+  <label>Fecha ITV</label>
   <input id="itv" type="date">
   <div class="actions">
     <button class="primary" id="guardarMoto">Guardar</button>
@@ -121,25 +145,57 @@ button.danger{
   </div>
 </div>
 
+<!-- MANTENIMIENTO -->
 <div id="mantenimiento" class="card hidden">
   <select id="motoSeleccionada"></select>
   <input id="km" placeholder="Kilómetros">
   <input id="fecha" type="date">
-  <label><input type="checkbox" value="Aceite"> Aceite</label>
-  <label><input type="checkbox" value="Filtro"> Filtro</label>
+
+  <h3>🛢️ Motor y transmisión</h3>
+  <label class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</label>
+  <label class="check-item"><input type="checkbox" value="Filtro aceite">Filtro de aceite</label>
+  <label class="check-item"><input type="checkbox" value="Bujías">Bujías</label>
+  <label class="check-item"><input type="checkbox" value="Válvulas">Reglaje de válvulas</label>
+  <label class="check-item"><input type="checkbox" value="Aceite caja">Aceite caja cambios</label>
+
+  <h3>🛑 Frenos</h3>
+  <label class="check-item"><input type="checkbox" value="Pastillas del.">Pastillas delanteras</label>
+  <label class="check-item"><input type="checkbox" value="Pastillas tras.">Pastillas traseras</label>
+  <label class="check-item"><input type="checkbox" value="Líquido frenos">Líquido de frenos</label>
+
+  <h3>🌡️ Refrigeración</h3>
+  <label class="check-item"><input type="checkbox" value="Anticongelante">Anticongelante</label>
+
+  <h3>🛠️ Suspensión</h3>
+  <label class="check-item"><input type="checkbox" value="Horquilla">Aceite horquilla</label>
+
   <div class="actions">
     <button class="primary" id="guardarRevision">Guardar</button>
     <button class="primary" id="volverMantenimiento">Volver</button>
   </div>
 </div>
 
+<!-- HISTORIAL -->
 <div id="historial" class="card hidden">
   <select id="historialMoto"></select>
   <ul id="listaHistorial"></ul>
-  <button class="primary" id="volverHistorial">Volver</button>
+  <div class="actions">
+    <button class="primary" id="btnPDF">📄 PDF</button>
+    <button class="primary" id="volverHistorial">Volver</button>
+  </div>
 </div>
 
 <!-- MODALES -->
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-card">
+    <p id="confirmText"></p>
+    <div class="modal-actions">
+      <button id="cancelDelete">Cancelar</button>
+      <button class="confirm" id="confirmDelete">Eliminar</button>
+    </div>
+  </div>
+</div>
+
 <div id="editModal" class="modal hidden">
   <div class="modal-card">
     <input type="date" id="editFecha">
@@ -152,13 +208,26 @@ button.danger{
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
 const $=id=>document.getElementById(id);
+const { jsPDF } = window.jspdf;
+
 const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
 const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
 
 let editMotoId=null, editRevisionIndex=null;
+
+function toast(msg,err){
+  const t=document.createElement('div');
+  t.className='toast'+(err?' error':'');
+  t.textContent=msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>t.remove(),3000);
+}
 
 function show(id){
  ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
@@ -171,10 +240,10 @@ function cargar(){
  motoSeleccionada.innerHTML='<option value="">Moto</option>';
  getMotos().forEach(m=>{
   const li=document.createElement('li');
-  li.textContent=m.datos.marca;
+  li.textContent=m.datos.marca+' '+(m.datos.modelo||'');
   listaMotos.appendChild(li);
   const o=document.createElement('option');
-  o.value=m.id; o.textContent=m.datos.marca;
+  o.value=m.id; o.textContent=li.textContent;
   motoSeleccionada.appendChild(o);
  });
 }
@@ -193,10 +262,12 @@ historialMoto.onchange=()=>{
  listaHistorial.innerHTML='';
  const motoId=historialMoto.value;
  const m=getMotos().find(x=>x.id===motoId);
- if(!m) return;
+ if(!m||m.historial.length===0){
+  listaHistorial.innerHTML='<li>No hay revisiones</li>'; return;
+ }
  m.historial.forEach((r,i)=>{
   const li=document.createElement('li');
-  li.innerHTML=`${r.fecha} – ${r.km} km
+  li.innerHTML=`${r.fecha} – ${r.km} km<br>${r.trabajos.join(', ')}
     <br><button class="primary">✏️ Editar</button>`;
   li.querySelector('button').onclick=()=>abrirEditor(motoId,i);
   listaHistorial.appendChild(li);
@@ -225,9 +296,23 @@ saveEdit.onclick=()=>{
  setMotos(motos);
  editModal.classList.add('hidden');
  historialMoto.onchange();
+ toast('Revisión actualizada');
 };
 
 cancelEdit.onclick=()=>editModal.classList.add('hidden');
+
+btnPDF.onclick=()=>{
+ const m=getMotos().find(x=>x.id===historialMoto.value);
+ if(!m||m.historial.length===0){ toast('Nada que exportar',true); return; }
+ const doc=new jsPDF();
+ let y=20;
+ doc.text('MotoCare – Historial',14,y); y+=10;
+ m.historial.forEach(r=>{
+  doc.text(`${r.fecha} – ${r.km} km`,14,y); y+=6;
+  doc.text(r.trabajos.join(', '),18,y); y+=8;
+ });
+ doc.save('MotoCare.pdf');
+};
 
 btnMoto.onclick=()=>show('moto');
 btnMantenimiento.onclick=()=>show('mantenimiento');
@@ -237,20 +322,44 @@ volverMantenimiento.onclick=
 volverHistorial.onclick=()=>show('home');
 
 guardarMoto.onclick=()=>{
+ if(!marca.value||!anio.value||!cilindrada.value||!itv.value){
+  toast('Rellena todos los campos',true); return;
+ }
  const motos=getMotos();
- motos.push({id:'m'+Date.now(),datos:{marca:marca.value},historial:[]});
- setMotos(motos); cargar(); show('home');
+ motos.push({id:'m'+Date.now(),datos:{
+  marca:marca.value,modelo:modelo.value,anio:anio.value,
+  cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
+ },historial:[]});
+ setMotos(motos);
+ cargar(); show('home');
 };
 
 guardarRevision.onclick=()=>{
+ if(!motoSeleccionada.value||!km.value||!fecha.value){
+  toast('Completa los campos',true); return;
+ }
  const motos=getMotos();
  const m=motos.find(x=>x.id===motoSeleccionada.value);
  const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
  m.historial.push({fecha:fecha.value,km:km.value,trabajos});
- setMotos(motos); show('home');
+ setMotos(motos);
+ toast('Revisión guardada');
+ show('home');
 };
 
+function comprobarAvisos(){
+ const hoy=new Date();
+ getMotos().forEach(m=>{
+  if(m.datos.itv){
+   const dias=Math.ceil((new Date(m.datos.itv)-hoy)/(1000*60*60*24));
+   if(dias<0) toast(`🚨 ITV caducada: ${m.datos.marca}`,true);
+   else if(dias<=30) toast(`⚠️ ITV próxima (${dias} días): ${m.datos.marca}`);
+  }
+ });
+}
+
 cargar();
+comprobarAvisos();
 });
 </script>
 </body>
