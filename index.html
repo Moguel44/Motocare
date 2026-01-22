@@ -123,12 +123,21 @@ button.danger{
 <div id="home" class="card">
   <h2>Motos registradas</h2>
   <ul id="listaMotos"></ul>
+
   <div class="actions">
     <button class="primary" id="btnMoto">➕ Moto</button>
     <button class="primary" id="btnMantenimiento">🛠️ Mantenimiento</button>
   </div>
+
+  <div class="actions">
+    <button class="primary" id="btnBackup">💾 Exportar backup</button>
+    <button class="primary" id="btnRestore">📂 Importar backup</button>
+  </div>
+
   <button class="primary" id="btnHistorial">📜 Historial</button>
 </div>
+
+<input type="file" id="fileRestore" accept=".json" class="hidden">
 
 <!-- MOTO -->
 <div id="moto" class="card hidden">
@@ -186,16 +195,6 @@ button.danger{
 </div>
 
 <!-- MODALES -->
-<div id="confirmModal" class="modal hidden">
-  <div class="modal-card">
-    <p id="confirmText"></p>
-    <div class="modal-actions">
-      <button id="cancelDelete">Cancelar</button>
-      <button class="confirm" id="confirmDelete">Eliminar</button>
-    </div>
-  </div>
-</div>
-
 <div id="editModal" class="modal hidden">
   <div class="modal-card">
     <input type="date" id="editFecha">
@@ -301,6 +300,7 @@ saveEdit.onclick=()=>{
 
 cancelEdit.onclick=()=>editModal.classList.add('hidden');
 
+/* PDF */
 btnPDF.onclick=()=>{
  const m=getMotos().find(x=>x.id===historialMoto.value);
  if(!m||m.historial.length===0){ toast('Nada que exportar',true); return; }
@@ -312,6 +312,38 @@ btnPDF.onclick=()=>{
   doc.text(r.trabajos.join(', '),18,y); y+=8;
  });
  doc.save('MotoCare.pdf');
+};
+
+/* BACKUP */
+btnBackup.onclick=()=>{
+ const data=getMotos();
+ if(data.length===0){ toast('No hay datos',true); return; }
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='MotoCare_backup_'+new Date().toISOString().slice(0,10)+'.json';
+ a.click();
+ toast('Backup exportado');
+};
+
+btnRestore.onclick=()=>fileRestore.click();
+
+fileRestore.onchange=e=>{
+ const file=e.target.files[0];
+ if(!file) return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(reader.result);
+   if(!Array.isArray(data)) throw 'Formato inválido';
+   setMotos(data);
+   cargar();
+   toast('Backup restaurado');
+  }catch{
+   toast('Archivo no válido',true);
+  }
+ };
+ reader.readAsText(file);
 };
 
 btnMoto.onclick=()=>show('moto');
@@ -347,19 +379,7 @@ guardarRevision.onclick=()=>{
  show('home');
 };
 
-function comprobarAvisos(){
- const hoy=new Date();
- getMotos().forEach(m=>{
-  if(m.datos.itv){
-   const dias=Math.ceil((new Date(m.datos.itv)-hoy)/(1000*60*60*24));
-   if(dias<0) toast(`🚨 ITV caducada: ${m.datos.marca}`,true);
-   else if(dias<=30) toast(`⚠️ ITV próxima (${dias} días): ${m.datos.marca}`);
-  }
- });
-}
-
 cargar();
-comprobarAvisos();
 });
 </script>
 </body>
