@@ -12,7 +12,6 @@
   --accent:#7dd3fc;
   --border:#1e293b;
 }
-
 body{
   margin:0;
   padding:16px;
@@ -20,11 +19,9 @@ body{
   background:var(--bg);
   color:#e5e7eb;
 }
-
 .header{text-align:center;margin-bottom:20px}
 .logo-big{width:110px;height:110px;border-radius:22px}
 h1{color:var(--accent);margin:10px 0}
-
 .card{
   max-width:720px;
   margin:0 auto 20px;
@@ -32,9 +29,7 @@ h1{color:var(--accent);margin:10px 0}
   background:rgba(2,6,23,.95);
   border-radius:18px;
 }
-
 .hidden{display:none}
-
 input,textarea,select{
   width:100%;
   margin-top:12px;
@@ -44,14 +39,12 @@ input,textarea,select{
   border-radius:12px;
   color:#e5e7eb;
 }
-
 .actions{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
   margin-top:18px;
 }
-
 button.primary{
   padding:14px;
   border-radius:22px;
@@ -63,41 +56,13 @@ button.primary{
   font-weight:600;
   cursor:pointer;
 }
-
 button.danger{
   background:#991b1b;
   color:#fff;
   border:none;
   padding:6px 10px;
   border-radius:12px;
-  cursor:pointer;
 }
-
-.check-item{
-  display:grid;
-  grid-template-columns:26px 1fr;
-  align-items:center;
-  gap:12px;
-  margin:10px 0;
-}
-
-.check-item input{width:20px;height:20px}
-
-.toast{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#020617;
-  border:1px solid var(--border);
-  padding:14px 18px;
-  border-radius:16px;
-  opacity:0;
-  transition:.3s;
-}
-.toast.show{opacity:1}
-.toast.error{border-color:#dc2626}
-
 .modal{
   position:fixed;
   inset:0;
@@ -119,11 +84,6 @@ button.danger{
   gap:12px;
   margin-top:16px;
 }
-.modal-actions button{
-  flex:1;
-  padding:12px;
-  border-radius:14px;
-}
 .modal-actions .confirm{
   background:#991b1b;
   color:#fff;
@@ -135,237 +95,160 @@ button.danger{
 <body>
 
 <div class="header">
-  <img src="Mi_Man.png" class="logo-big">
   <h1>MotoCare</h1>
 </div>
 
-<!-- HOME -->
 <div id="home" class="card">
   <h2>Motos registradas</h2>
-  <ul id="listaMotos" style="list-style:none;padding:0"></ul>
+  <ul id="listaMotos"></ul>
   <div class="actions">
     <button class="primary" id="btnMoto">➕ Moto</button>
     <button class="primary" id="btnMantenimiento">🛠️ Mantenimiento</button>
   </div>
-  <button class="primary" style="margin-top:12px" id="btnHistorial">📜 Historial</button>
+  <button class="primary" id="btnHistorial">📜 Historial</button>
 </div>
 
-<!-- MOTO -->
 <div id="moto" class="card hidden">
-  <h2>Tu moto</h2>
   <input id="marca" placeholder="Marca">
   <input id="modelo" placeholder="Modelo">
   <input id="anio" placeholder="Año">
   <input id="cilindrada" placeholder="Cilindrada">
   <input id="neumaticos" placeholder="Neumáticos">
-  <label>Fecha ITV</label>
   <input id="itv" type="date">
   <div class="actions">
-    <button class="primary" id="guardarMoto">💾 Guardar</button>
-    <button class="primary" id="volverMoto">⬅️ Volver</button>
+    <button class="primary" id="guardarMoto">Guardar</button>
+    <button class="primary" id="volverMoto">Volver</button>
   </div>
 </div>
 
-<!-- MANTENIMIENTO -->
 <div id="mantenimiento" class="card hidden">
-  <h2>Mantenimiento</h2>
-  <label>Moto</label>
   <select id="motoSeleccionada"></select>
-
   <input id="km" placeholder="Kilómetros">
-  <label>Fecha mantenimiento</label>
   <input id="fecha" type="date">
-  <textarea id="obs" placeholder="Observaciones"></textarea>
-  <textarea id="pendiente" placeholder="Pendiente / por hacer"></textarea>
-
-  <h3>🛢️ Motor y transmisión</h3>
-  <label class="check-item"><input type="checkbox" value="Aceite">Cambio de aceite</label>
-  <label class="check-item"><input type="checkbox" value="Filtro aceite">Filtro de aceite</label>
-  <label class="check-item"><input type="checkbox" value="Bujías">Bujías</label>
-
+  <label><input type="checkbox" value="Aceite"> Aceite</label>
+  <label><input type="checkbox" value="Filtro"> Filtro</label>
   <div class="actions">
-    <button class="primary" id="guardarRevision">💾 Guardar</button>
-    <button class="primary" id="volverMantenimiento">⬅️ Volver</button>
+    <button class="primary" id="guardarRevision">Guardar</button>
+    <button class="primary" id="volverMantenimiento">Volver</button>
   </div>
 </div>
 
-<!-- HISTORIAL -->
 <div id="historial" class="card hidden">
-  <h2>Historial de mantenimiento</h2>
-  <label>Selecciona moto</label>
   <select id="historialMoto"></select>
   <ul id="listaHistorial"></ul>
-  <div class="actions">
-    <button class="primary" id="btnPDF">📄 Exportar PDF</button>
-    <button class="primary" id="volverHistorial">⬅️ Volver</button>
-  </div>
+  <button class="primary" id="volverHistorial">Volver</button>
 </div>
 
-<!-- MODAL -->
-<div id="confirmModal" class="modal hidden">
-  <div class="modal-card">
-    <p id="confirmText"></p>
-    <div class="modal-actions">
-      <button id="cancelDelete">Cancelar</button>
-      <button class="confirm" id="confirmDelete">Eliminar</button>
-    </div>      
-  </div>
-</div>
-  <!-- MODAL EDITAR REVISION -->
+<!-- MODALES -->
 <div id="editModal" class="modal hidden">
   <div class="modal-card">
-    <h3>Editar revisión</h3>
-
-    <label>Fecha</label>
     <input type="date" id="editFecha">
-
-    <label>Kilómetros</label>
-    <input id="editKm" placeholder="Kilómetros">
-
-    <label>Trabajos (separados por coma)</label>
+    <input id="editKm">
     <textarea id="editTrabajos"></textarea>
-
     <div class="modal-actions">
       <button id="cancelEdit">Cancelar</button>
       <button class="confirm" id="saveEdit">Guardar</button>
     </div>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
+
+<script>
 document.addEventListener('DOMContentLoaded',()=>{
 const $=id=>document.getElementById(id);
 const getMotos=()=>JSON.parse(localStorage.getItem('motos')||'[]');
 const setMotos=m=>localStorage.setItem('motos',JSON.stringify(m));
 
-function toast(msg,err){
-  const t=document.createElement('div');
-  t.className='toast'+(err?' error':'');
-  t.textContent=msg;
-  document.body.appendChild(t);
-  requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>t.remove(),3000);
-}
+let editMotoId=null, editRevisionIndex=null;
 
 function show(id){
-  ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
-  $(id).classList.remove('hidden');
-  if(id==='historial') cargarSelectorHistorial();
+ ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
+ $(id).classList.remove('hidden');
+ if(id==='historial') cargarHistorialSelector();
 }
 
 function cargar(){
-  $('listaMotos').innerHTML='';
-  $('motoSeleccionada').innerHTML='<option value="">Selecciona una moto</option>';
-  getMotos().forEach(m=>{
-    const li=document.createElement('li');
-    li.style.display='flex';
-    li.style.justifyContent='space-between';
-    li.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
-
-    const b=document.createElement('button');
-    b.className='danger';
-    b.textContent='🗑️';
-    b.onclick=()=>confirmarEliminar(m.id);
-
-    li.appendChild(b);
-    $('listaMotos').appendChild(li);
-
-    const o=document.createElement('option');
-    o.value=m.id;
-    o.textContent=li.textContent;
-    $('motoSeleccionada').appendChild(o);
-  });
+ listaMotos.innerHTML='';
+ motoSeleccionada.innerHTML='<option value="">Moto</option>';
+ getMotos().forEach(m=>{
+  const li=document.createElement('li');
+  li.textContent=m.datos.marca;
+  listaMotos.appendChild(li);
+  const o=document.createElement('option');
+  o.value=m.id; o.textContent=m.datos.marca;
+  motoSeleccionada.appendChild(o);
+ });
 }
 
-function guardarMoto(){
-  const campos=['marca','modelo','anio','cilindrada','neumaticos','itv'];
-  if(campos.some(c=>!$(c).value)){
-    toast('Rellena todos los campos',true);return;
-  }
-  const motos=getMotos();
-  motos.push({
-    id:'m'+Date.now(),
-    datos:{
-      marca:marca.value,modelo:modelo.value,anio:anio.value,
-      cilindrada:cilindrada.value,neumaticos:neumaticos.value,itv:itv.value
-    },
-    historial:[]
-  });
-  setMotos(motos);
-  campos.forEach(c=>$(c).value='');
-  cargar(); show('home');
-}
-
-let borrarId=null;
-function confirmarEliminar(id){
-  borrarId=id;
-  const m=getMotos().find(x=>x.id===id);
-  confirmText.textContent=`¿Eliminar ${m.datos.marca} ${m.datos.modelo||''} y su historial?`;
-  confirmModal.classList.remove('hidden');
-}
-
-confirmDelete.onclick=()=>{
-  setMotos(getMotos().filter(m=>m.id!==borrarId));
-  confirmModal.classList.add('hidden');
-  cargar();
-  cargarSelectorHistorial();
-};
-
-cancelDelete.onclick=()=>confirmModal.classList.add('hidden');
-
-function guardarRevision(){
-  if(!motoSeleccionada.value||!km.value||!fecha.value){
-    toast('Completa los campos obligatorios',true);return;
-  }
-  const motos=getMotos();
-  const m=motos.find(x=>x.id===motoSeleccionada.value);
-  const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
-  m.historial.push({km:km.value,fecha:fecha.value,trabajos});
-  setMotos(motos);
-  km.value=fecha.value='';
-  document.querySelectorAll('#mantenimiento input[type=checkbox]').forEach(c=>c.checked=false);
-  toast('Revisión guardada');
-  show('home');
-}
-
-function cargarSelectorHistorial(){
-  historialMoto.innerHTML='<option value="">Selecciona una moto</option>';
-  getMotos().forEach(m=>{
-    const o=document.createElement('option');
-    o.value=m.id;
-    o.textContent=`${m.datos.marca} ${m.datos.modelo||''}`;
-    historialMoto.appendChild(o);
-  });
-  listaHistorial.innerHTML='';
+function cargarHistorialSelector(){
+ historialMoto.innerHTML='<option value="">Moto</option>';
+ getMotos().forEach(m=>{
+  const o=document.createElement('option');
+  o.value=m.id; o.textContent=m.datos.marca;
+  historialMoto.appendChild(o);
+ });
+ listaHistorial.innerHTML='';
 }
 
 historialMoto.onchange=()=>{
-  listaHistorial.innerHTML='';
-  const m=getMotos().find(x=>x.id===historialMoto.value);
-  if(!m||m.historial.length===0){
-    listaHistorial.innerHTML='<li>No hay revisiones</li>';return;
-  }
-  m.historial.forEach(r=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<strong>${r.fecha}</strong> – ${r.km} km<br>${r.trabajos.join(', ')}`;
-    listaHistorial.appendChild(li);
-  });
+ listaHistorial.innerHTML='';
+ const motoId=historialMoto.value;
+ const m=getMotos().find(x=>x.id===motoId);
+ if(!m) return;
+ m.historial.forEach((r,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`${r.fecha} – ${r.km} km
+    <br><button class="primary">✏️ Editar</button>`;
+  li.querySelector('button').onclick=()=>abrirEditor(motoId,i);
+  listaHistorial.appendChild(li);
+ });
 };
 
-btnPDF.onclick=()=>{
-  window.print();
+function abrirEditor(motoId,i){
+ const m=getMotos().find(x=>x.id===motoId);
+ const r=m.historial[i];
+ editMotoId=motoId;
+ editRevisionIndex=i;
+ editFecha.value=r.fecha;
+ editKm.value=r.km;
+ editTrabajos.value=r.trabajos.join(', ');
+ editModal.classList.remove('hidden');
+}
+
+saveEdit.onclick=()=>{
+ const motos=getMotos();
+ const m=motos.find(x=>x.id===editMotoId);
+ m.historial[editRevisionIndex]={
+  fecha:editFecha.value,
+  km:editKm.value,
+  trabajos:editTrabajos.value.split(',').map(t=>t.trim())
+ };
+ setMotos(motos);
+ editModal.classList.add('hidden');
+ historialMoto.onchange();
 };
+
+cancelEdit.onclick=()=>editModal.classList.add('hidden');
 
 btnMoto.onclick=()=>show('moto');
 btnMantenimiento.onclick=()=>show('mantenimiento');
 btnHistorial.onclick=()=>show('historial');
-
 volverMoto.onclick=
 volverMantenimiento.onclick=
 volverHistorial.onclick=()=>show('home');
 
-guardarMoto.onclick=guardarMoto;
-guardarRevision.onclick=guardarRevision;
+guardarMoto.onclick=()=>{
+ const motos=getMotos();
+ motos.push({id:'m'+Date.now(),datos:{marca:marca.value},historial:[]});
+ setMotos(motos); cargar(); show('home');
+};
+
+guardarRevision.onclick=()=>{
+ const motos=getMotos();
+ const m=motos.find(x=>x.id===motoSeleccionada.value);
+ const trabajos=[...document.querySelectorAll('#mantenimiento input[type=checkbox]:checked')].map(c=>c.value);
+ m.historial.push({fecha:fecha.value,km:km.value,trabajos});
+ setMotos(motos); show('home');
+};
 
 cargar();
 });
