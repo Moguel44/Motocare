@@ -1,20 +1,19 @@
-const CACHE_NAME = 'motocare-v4';
+const CACHE_NAME = 'motocare-v5';
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
-        '/MotoCare/',
-        '/MotoCare/index.html',
-        '/MotoCare/manifest.json',
-        '/MotoCare/Mi_Man.png',
-        '/MotoCare/icon-192.png',
-        '/MotoCare/icon-512.png'
+        '/Motocare/',
+        '/Motocare/index.html',
+        '/Motocare/manifest.json',
+        '/Motocare/Mi_Man.png',
+        '/Motocare/icon-192.png',
+        '/Motocare/icon-512.png'
       ])
     )
   );
   self.skipWaiting();
-});
 });
 
 self.addEventListener('activate', event => {
@@ -41,8 +40,8 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'ITV_ALERT') {
     self.registration.showNotification('MotoCare', {
       body: event.data.text,
-      icon: './Mi_Man.png',
-      badge: './Mi_Man.png'
+      icon: '/Motocare/Mi_Man.png',
+      badge: '/Motocare/Mi_Man.png'
     });
   }
 });
