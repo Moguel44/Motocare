@@ -208,6 +208,26 @@ button.danger{
     <div class="modal-actions">
       <button id="cancelDelete">Cancelar</button>
       <button class="confirm" id="confirmDelete">Eliminar</button>
+    </div>      
+  </div>
+</div>
+  <!-- MODAL EDITAR REVISION -->
+<div id="editModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>Editar revisión</h3>
+
+    <label>Fecha</label>
+    <input type="date" id="editFecha">
+
+    <label>Kilómetros</label>
+    <input id="editKm" placeholder="Kilómetros">
+
+    <label>Trabajos (separados por coma)</label>
+    <textarea id="editTrabajos"></textarea>
+
+    <div class="modal-actions">
+      <button id="cancelEdit">Cancelar</button>
+      <button class="confirm" id="saveEdit">Guardar</button>
     </div>
   </div>
 </div>
