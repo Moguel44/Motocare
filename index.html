@@ -239,6 +239,16 @@ function solicitarNotificaciones(){
     });
   }
 }
+
+function enviarNotificacion(texto){
+  if(!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+
+  navigator.serviceWorker.controller.postMessage({
+    type: 'ITV_ALERT',
+    text: texto
+  });
+}
+
 function show(id){
  ['home','moto','mantenimiento','historial'].forEach(s=>$(s).classList.add('hidden'));
  $(id).classList.remove('hidden');
