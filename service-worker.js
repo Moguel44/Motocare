@@ -1,4 +1,4 @@
-const CACHE_NAME = 'motocare-v2';
+const CACHE_NAME = 'motocare-v3';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
