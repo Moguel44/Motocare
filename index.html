@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<div class="header">
-  <img src="Mi_Man.png" alt="MotoCare" class="logo-big">
-  <h1>MotoCare</h1>
-</div>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MotoCare</title>
 
@@ -120,6 +116,7 @@ button.danger{
 <body>
 
 <div class="header">
+  <img src="Mi_Man.png" alt="MotoCare" class="logo-big">
   <h1>MotoCare</h1>
 </div>
 
@@ -198,7 +195,7 @@ button.danger{
   </div>
 </div>
 
-<!-- MODALES -->
+<!-- MODAL EDITAR -->
 <div id="editModal" class="modal hidden">
   <div class="modal-card">
     <input type="date" id="editFecha">
@@ -304,28 +301,52 @@ saveEdit.onclick=()=>{
 
 cancelEdit.onclick=()=>editModal.classList.add('hidden');
 
-/* PDF */
+/* PDF CON LOGO */
 btnPDF.onclick=()=>{
  const m=getMotos().find(x=>x.id===historialMoto.value);
- if(!m||m.historial.length===0){ toast('Nada que exportar',true); return; }
+ if(!m||m.historial.length===0){
+  toast('Nada que exportar',true); return;
+ }
+
  const doc=new jsPDF();
  let y=20;
- doc.text('MotoCare – Historial',14,y); y+=10;
- m.historial.forEach(r=>{
-  doc.text(`${r.fecha} – ${r.km} km`,14,y); y+=6;
-  doc.text(r.trabajos.join(', '),18,y); y+=8;
- });
- doc.save('MotoCare.pdf');
+
+ const img=new Image();
+ img.src='Mi_Man.png';
+
+ img.onload=()=>{
+  doc.addImage(img,'PNG',60,y,90,90);
+  y+=105;
+
+  doc.setFontSize(18);
+  doc.text('MotoCare – Historial de mantenimiento',105,y,{align:'center'});
+  y+=15;
+
+  doc.setFontSize(11);
+  doc.text(`Moto: ${m.datos.marca} ${m.datos.modelo||''}`,14,y); y+=6;
+  doc.text(`Año: ${m.datos.anio} | Cilindrada: ${m.datos.cilindrada}`,14,y); y+=6;
+  doc.text(`ITV: ${m.datos.itv}`,14,y); y+=10;
+
+  m.historial.forEach((r,i)=>{
+    if(y>270){doc.addPage();y=20;}
+    doc.text(`${i+1}. ${r.fecha} – ${r.km} km`,14,y); y+=6;
+    doc.setFontSize(10);
+    doc.text(r.trabajos.join(', '),18,y); y+=8;
+    doc.setFontSize(11);
+  });
+
+  doc.save(`MotoCare_${m.datos.marca}.pdf`);
+ };
 };
 
 /* BACKUP */
 btnBackup.onclick=()=>{
  const data=getMotos();
- if(data.length===0){ toast('No hay datos',true); return; }
+ if(data.length===0){toast('No hay datos',true);return;}
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
  const a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download='MotoCare_backup_'+new Date().toISOString().slice(0,10)+'.json';
+ a.download='MotoCare_backup.json';
  a.click();
  toast('Backup exportado');
 };
@@ -334,12 +355,12 @@ btnRestore.onclick=()=>fileRestore.click();
 
 fileRestore.onchange=e=>{
  const file=e.target.files[0];
- if(!file) return;
+ if(!file)return;
  const reader=new FileReader();
  reader.onload=()=>{
   try{
    const data=JSON.parse(reader.result);
-   if(!Array.isArray(data)) throw 'Formato inválido';
+   if(!Array.isArray(data)) throw 'Error';
    setMotos(data);
    cargar();
    toast('Backup restaurado');
