@@ -210,18 +210,56 @@ function show(id){
 $(id).classList.remove('hidden');
 if(id==='historial') cargarHistorialSelector();
 }
+// 🔴 AÑADIDO: eliminar moto + historial
+function eliminarMoto(id){
+  const motos = getMotos();
+  const moto = motos.find(m => m.id === id);
+  if(!moto) return;
+
+  if(!confirm(`¿Eliminar la moto "${moto.datos.marca} ${moto.datos.modelo || ''}" y todo su historial?`)){
+    return;
+  }
+
+  const nuevasMotos = motos.filter(m => m.id !== id);
+  setMotos(nuevasMotos);
+
+  cargar();
+  toast('Moto eliminada');
+}
 
 function cargar(){
-listaMotos.innerHTML='';
-motoSeleccionada.innerHTML='<option value="">Moto</option>';
-getMotos().forEach(m=>{
-const li=document.createElement('li');
-li.textContent=m.datos.marca+' '+(m.datos.modelo||'');
-listaMotos.appendChild(li);
-const o=document.createElement('option');
-o.value=m.id; o.textContent=li.textContent;
-motoSeleccionada.appendChild(o);
-});
+  listaMotos.innerHTML='';
+  motoSeleccionada.innerHTML='<option value="">Moto</option>';
+
+  getMotos().forEach(m=>{
+    const li = document.createElement('li');
+
+    // contenedor horizontal
+    const wrap = document.createElement('div');
+    wrap.style.display = 'flex';
+    wrap.style.justifyContent = 'space-between';
+    wrap.style.alignItems = 'center';
+
+    // nombre de la moto
+    const nombre = document.createElement('span');
+    nombre.textContent = m.datos.marca + ' ' + (m.datos.modelo || '');
+
+    // 🔴 BOTÓN ELIMINAR
+    const btnEliminar = document.createElement('button');
+    btnEliminar.textContent = '🗑';
+    btnEliminar.className = 'danger';
+    btnEliminar.onclick = () => eliminarMoto(m.id);
+
+    wrap.appendChild(nombre);
+    wrap.appendChild(btnEliminar);
+    li.appendChild(wrap);
+    listaMotos.appendChild(li);
+
+    const o = document.createElement('option');
+    o.value = m.id;
+    o.textContent = nombre.textContent;
+    motoSeleccionada.appendChild(o);
+  });
 }
 
 function cargarHistorialSelector(){
@@ -409,4 +447,4 @@ solicitarNotificaciones();
 });
 </script>  </body>
 
-</html>/html>
+</html>
